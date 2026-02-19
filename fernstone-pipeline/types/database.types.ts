@@ -6,7 +6,7 @@ export type Json =
     | { [key: string]: Json | undefined }
     | Json[]
 
-export interface Database {
+export type Database = {
     public: {
         Tables: {
             projects: {
@@ -34,6 +34,7 @@ export interface Database {
                     req_additional_insured?: boolean | null
                     created_at?: string | null
                 }
+                Relationships: []
             }
             subcontractors: {
                 Row: {
@@ -60,6 +61,15 @@ export interface Database {
                     magic_link_token?: string | null
                     created_at?: string | null
                 }
+                Relationships: [
+                    {
+                        foreignKeyName: "subcontractors_project_id_fkey"
+                        columns: ["project_id"]
+                        isOneToOne: false
+                        referencedRelation: "projects"
+                        referencedColumns: ["id"]
+                    }
+                ]
             }
             compliance_reports: {
                 Row: {
@@ -92,6 +102,15 @@ export interface Database {
                     is_compliant?: boolean | null
                     created_at?: string | null
                 }
+                Relationships: [
+                    {
+                        foreignKeyName: "compliance_reports_sub_id_fkey"
+                        columns: ["sub_id"]
+                        isOneToOne: false
+                        referencedRelation: "subcontractors"
+                        referencedColumns: ["id"]
+                    }
+                ]
             }
         }
         Views: {
@@ -101,6 +120,9 @@ export interface Database {
             [_ in never]: never
         }
         Enums: {
+            [_ in never]: never
+        }
+        CompositeTypes: {
             [_ in never]: never
         }
     }
