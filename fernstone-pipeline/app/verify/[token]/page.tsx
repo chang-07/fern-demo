@@ -2,6 +2,7 @@
 import { createClient } from "@/utils/supabase/server"
 import { notFound } from "next/navigation"
 import { UploadCard } from "@/components/UploadCard"
+import { UpsellButton } from "@/components/UpsellButton"
 import { CheckCircle, AlertTriangle } from "lucide-react"
 
 export default async function VerifyPage({ params }: { params: Promise<{ token: string }> }) {
@@ -90,9 +91,7 @@ export default async function VerifyPage({ params }: { params: Promise<{ token: 
 
                             {/* Upsell / Fix It Action (Phase 7) */}
                             <div className="pt-4 border-t border-amber-900/50">
-                                <button className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md font-bold transition-colors">
-                                    Fix Coverage Instantly (~$300)
-                                </button>
+                                <UpsellButton subcontractorId={sub.id} />
                             </div>
                         </div>
                     )}

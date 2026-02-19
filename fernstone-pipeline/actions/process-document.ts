@@ -77,7 +77,7 @@ export async function processDocument(subcontractorId: string, filePath: string)
                 extracted_gl_limit: glLimit,
                 has_additional_insured: hasAddlInsured,
                 expiry_date: insuranceData.expiry_date,
-                raw_ai_output: insuranceData,
+                raw_ai_output: insuranceData as any,
                 is_compliant: isCompliant
             })
 
