@@ -19,22 +19,30 @@ export async function createProject(formData: FormData) {
     }
 
     const name = formData.get('name') as string
-    const req_gl_occurrence = formData.get('req_gl_occurrence') as string
-    const req_additional_insured = formData.get('req_additional_insured') === 'on'
+    const glLimit = parseInt(formData.get('glLimit') as string) || 1000000
+    const aggregateLimit = parseInt(formData.get('aggregateLimit') as string) || 2000000
+    // We could add more fields here (WC, Auto, etc.)
 
     if (!name) {
         return { error: 'Project name is required' }
     }
 
-    const { error } = await supabase.from('projects').insert({
-        gc_id: user.id,
-        name,
-        req_gl_occurrence: req_gl_occurrence ? parseInt(req_gl_occurrence) : 2000000,
-        req_additional_insured,
-    })
+    const { error: insertError } = await supabase
+        .from('projects')
+        .insert({
+            gc_id: user.id,
+            name,
+            req_gl_occurrence: glLimit,
+            requirements: {
+                gl: {
+                    occurrence: glLimit,
+                    aggregate: aggregateLimit
+                }
+            }
+        })
 
-    if (error) {
-        return { error: error.message }
+    if (insertError) {
+        return { error: insertError.message }
     }
 
     revalidatePath('/dashboard')

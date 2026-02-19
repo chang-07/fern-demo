@@ -57,6 +57,10 @@ export async function inviteSubcontractor(formData: FormData) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
     const magicLink = `${baseUrl}/verify/${token}`
 
+    console.log('--- MAGIC LINK (For Dev) ---')
+    console.log(magicLink)
+    console.log('----------------------------')
+
     // Send email
     try {
         await resend.emails.send({

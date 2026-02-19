@@ -16,6 +16,7 @@ export type Database = {
                     name: string
                     req_gl_occurrence: number | null
                     req_additional_insured: boolean | null
+                    requirements: Json | null
                     created_at: string | null
                 }
                 Insert: {
@@ -24,6 +25,7 @@ export type Database = {
                     name: string
                     req_gl_occurrence?: number | null
                     req_additional_insured?: boolean | null
+                    requirements?: Json | null
                     created_at?: string | null
                 }
                 Update: {
@@ -32,6 +34,7 @@ export type Database = {
                     name?: string
                     req_gl_occurrence?: number | null
                     req_additional_insured?: boolean | null
+                    requirements?: Json | null
                     created_at?: string | null
                 }
                 Relationships: []

@@ -70,15 +70,15 @@ export function CreateProjectModal() {
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-right text-slate-300">
-                            Name
-                        </Label>
+                    <div className="grid gap-2">
+                        <Label htmlFor="name" className="text-slate-300">Project Name</Label>
                         <Input
                             id="name"
+                            name="name"
+                            placeholder="e.g. Westside Office Complex"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="col-span-3 bg-slate-800 border-slate-700 text-white"
+                            className="bg-slate-800 border-slate-700 text-white"
                             required
                         />
                     </div>

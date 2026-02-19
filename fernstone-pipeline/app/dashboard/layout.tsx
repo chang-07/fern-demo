@@ -1,3 +1,4 @@
+import Image from "next/image";
 
 export default function DashboardLayout({
     children,
@@ -9,7 +10,14 @@ export default function DashboardLayout({
             <nav className="border-b border-slate-800 bg-slate-950 p-4">
                 <div className="container mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded bg-emerald-500" />
+                        <div className="relative h-8 w-8">
+                            <Image
+                                src="/logo.avif"
+                                alt="Fernstone Logo"
+                                fill
+                                className="object-contain"
+                            />
+                        </div>
                         <span className="text-xl font-bold tracking-tight text-white">Fernstone</span>
                     </div>
                     <div className="flex items-center gap-4">

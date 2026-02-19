@@ -1,5 +1,6 @@
 
 import Link from "next/link"
+import Image from "next/image"
 import { ShieldCheck, ArrowRight, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -9,8 +10,13 @@ export default function Home() {
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded bg-emerald-500 flex items-center justify-center">
-              <ShieldCheck className="text-white h-5 w-5" />
+            <div className="relative h-8 w-8">
+              <Image
+                src="/logo.avif"
+                alt="Fernstone Logo"
+                fill
+                className="object-contain"
+              />
             </div>
             <span className="text-xl font-bold tracking-tight text-white">Fernstone</span>
           </div>

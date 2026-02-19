@@ -11,18 +11,23 @@ export async function parseInsuranceDoc(fileBuffer: Buffer, fileName: string): P
     try {
         await fs.writeFile(tempFilePath, fileBuffer);
 
-        const parser = new LlamaParse({ resultType: "markdown" });
-        const documents = await parser.loadData(tempFilePath);
+        const parser = new LlamaParse({
+            apiKey: process.env.LLAMA_CLOUD_API_KEY as string
+        });
 
-        // Cleanup
+        const blob = new Blob([fileBuffer]);
+        const result = await parser.parseFile(blob as any); // Cast as any to avoid DOM File vs Node Blob issues if strictly typed
+        return result.markdown;
         await fs.unlink(tempFilePath);
-
-        return documents[0].text;
     } catch (error) {
         // Ensure cleanup on error
-        try {
+        const exists = await fs
+            .access(tempFilePath)
+            .then(() => true)
+            .catch(() => false);
+        if (exists) {
             await fs.unlink(tempFilePath);
-        } catch { }
+        }
         console.error("LlamaParse error:", error);
         throw new Error("Failed to parse document");
     }

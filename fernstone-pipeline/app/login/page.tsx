@@ -1,19 +1,26 @@
 
+import Image from "next/image"
 import { login, signup } from './actions'
-import { ShieldCheck } from "lucide-react"
+import { ShieldCheck, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 
-export default function LoginPage() {
+export default async function LoginPage(props: { searchParams: Promise<{ error?: string }> }) {
+    const searchParams = await props.searchParams
     return (
         <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
             <Card className="w-full max-w-md bg-slate-900 border-slate-800 text-slate-50">
                 <CardHeader className="space-y-1">
                     <div className="flex items-center gap-2 mb-2">
-                        <div className="h-8 w-8 rounded bg-emerald-500 flex items-center justify-center">
-                            <ShieldCheck className="text-white h-5 w-5" />
+                        <div className="relative h-8 w-8">
+                            <Image
+                                src="/logo.avif"
+                                alt="Fernstone Logo"
+                                fill
+                                className="object-contain"
+                            />
                         </div>
                         <span className="text-xl font-bold tracking-tight text-white">Fernstone</span>
                     </div>
@@ -23,6 +30,12 @@ export default function LoginPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="grid gap-4">
+                    {searchParams.error && (
+                        <div className="bg-red-900/20 border border-red-900 p-3 rounded flex items-center gap-2 text-red-200 text-sm">
+                            <AlertCircle className="w-4 h-4" />
+                            {searchParams.error}
+                        </div>
+                    )}
                     <form className="space-y-4">
                         <div className="grid gap-2">
                             <Label htmlFor="email" className="text-slate-200">Email</Label>
