@@ -1,10 +1,29 @@
+
 import { ProjectList } from "@/components/ProjectList";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { CreateProjectModal } from "@/components/CreateProjectModal";
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+    const supabase = await createClient();
+
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+        return redirect("/login");
+    }
+
+    const { data: projects } = await supabase
+        .from("projects")
+        .select("*")
+        .eq("gc_id", user.id)
+        .order("created_at", { ascending: false });
+
     return (
         <div className="space-y-8">
             <div className="flex items-center justify-between">
@@ -15,7 +34,7 @@ export default function DashboardPage() {
                 <CreateProjectModal />
             </div>
 
-            <ProjectList />
+            <ProjectList projects={projects || []} />
         </div>
     );
 }

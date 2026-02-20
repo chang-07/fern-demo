@@ -1,12 +1,16 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { parseInsuranceDoc } from '@/lib/llama-parse'
 import { extractInsuranceData } from '@/lib/openai'
 import { revalidatePath } from 'next/cache'
 
 export async function processDocument(subcontractorId: string, filePath: string) {
-    const supabase = await createClient()
+    // Admin client to bypass RLS for background processing
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
     console.log(`Processing document for ${subcontractorId} at ${filePath}`)
 
