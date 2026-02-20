@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { resend } from '@/utils/resend'
+import { resend } from '@/lib/resend'
 import { revalidatePath } from 'next/cache'
 
 export async function inviteSubcontractor(formData: FormData) {

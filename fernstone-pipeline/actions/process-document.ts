@@ -70,6 +70,18 @@ export async function processDocument(subcontractorId: string, filePath: string)
 
         const isCompliant = isLimitCompliant && isAddlInsuredCompliant && isNotExpired
 
+        // Calculate Deficiencies
+        const deficiencies: string[] = []
+        if (!isLimitCompliant) {
+            deficiencies.push(`GL Occurrence Limit ($${glLimit.toLocaleString()}) is below required ($${requiredLimit.toLocaleString()})`)
+        }
+        if (!isAddlInsuredCompliant) {
+            deficiencies.push("Missing required Additional Insured endorsement")
+        }
+        if (!isNotExpired) {
+            deficiencies.push(`Policy is expired (Expired: ${insuranceData.expiry_date})`)
+        }
+
         // 6. Save Compliance Report
         // First, check if report exists? Schema ID is UUID default gen.
         // We can just insert a new one or update.
@@ -82,7 +94,8 @@ export async function processDocument(subcontractorId: string, filePath: string)
                 has_additional_insured: hasAddlInsured,
                 expiry_date: insuranceData.expiry_date,
                 raw_ai_output: insuranceData as any,
-                is_compliant: isCompliant
+                is_compliant: isCompliant,
+                deficiencies: deficiencies as any // JSONB
             })
 
         if (reportError) throw reportError

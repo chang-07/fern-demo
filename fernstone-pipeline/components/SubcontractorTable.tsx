@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, AlertTriangle, Clock, Download } from "lucide-react"
+import { EmailSubcontractorModal } from "@/components/EmailSubcontractorModal"
 
 export async function SubcontractorTable({ projectId }: { projectId: string }) {
     const supabase = await createClient()
@@ -28,7 +29,8 @@ export async function SubcontractorTable({ projectId }: { projectId: string }) {
         extracted_gl_limit,
         has_additional_insured,
         expiry_date,
-        is_compliant
+        is_compliant,
+        deficiencies
       )
     `)
         .eq("project_id", projectId)
@@ -61,12 +63,7 @@ export async function SubcontractorTable({ projectId }: { projectId: string }) {
                     </TableHeader>
                     <TableBody>
                         {subcontractors.map((sub) => {
-                            const report = sub.compliance_reports?.[0] // Assuming one report or taking latest if many?
-                            // Schema implies one-to-many potentially or one-to-one?
-                            // actually sub_id is FK in reports, so one sub can have multiple reports?
-                            // Usually yes, re-uploads.
-                            // Let's assume the latest report for now.
-                            // We didn't order reports in the query, might need to fix that if multiple.
+                            const report = sub.compliance_reports?.[0] as any // Cast to allow accessing deficiencies
 
                             const statusColors = {
                                 INVITED: "bg-slate-800 text-slate-400 border-slate-700",
@@ -82,6 +79,16 @@ export async function SubcontractorTable({ projectId }: { projectId: string }) {
                                         <Badge variant="outline" className={`${statusColors[sub.status as keyof typeof statusColors] || statusColors.INVITED}`}>
                                             {sub.status}
                                         </Badge>
+                                        {sub.status === 'NON_COMPLIANT' && report?.deficiencies && Array.isArray(report.deficiencies) && report.deficiencies.length > 0 && (
+                                            <div className="mt-2 text-xs text-amber-500 space-y-1">
+                                                {report.deficiencies.map((def: string, i: number) => (
+                                                    <div key={i} className="flex items-start gap-1">
+                                                        <span>•</span>
+                                                        <span>{def}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </TableCell>
                                     <TableCell className="text-slate-300">
                                         {report?.extracted_gl_limit
@@ -98,10 +105,16 @@ export async function SubcontractorTable({ projectId }: { projectId: string }) {
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-400 hover:text-white">
-                                            <Download className="h-4 w-4" />
-                                            <span className="sr-only">Download COI</span>
-                                        </Button>
+                                        <div className="flex items-center gap-2">
+                                            <EmailSubcontractorModal
+                                                subcontractorId={sub.id}
+                                                subcontractorEmail={sub.email}
+                                            />
+                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-400 hover:text-white">
+                                                <Download className="h-4 w-4" />
+                                                <span className="sr-only">Download COI</span>
+                                            </Button>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             )

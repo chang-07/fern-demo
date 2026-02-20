@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server"
 import { notFound } from "next/navigation"
 import { UploadCard } from "@/components/UploadCard"
 import { UpsellButton } from "@/components/UpsellButton"
+import { ContactGCModal } from "@/components/ContactGCModal"
 import { CheckCircle, AlertTriangle } from "lucide-react"
 
 export default async function VerifyPage({ params }: { params: Promise<{ token: string }> }) {
@@ -98,7 +99,12 @@ export default async function VerifyPage({ params }: { params: Promise<{ token: 
 
                     {/* State 3: Pending Upload */}
                     {!report && (
-                        <UploadCard subcontractorId={sub.id} token={token} />
+                        <div className="space-y-4">
+                            <UploadCard subcontractorId={sub.id} token={token} />
+                            <div className="pt-2">
+                                <ContactGCModal subcontractorId={sub.id} projectName={project.name} />
+                            </div>
+                        </div>
                     )}
                 </div>
             </main>

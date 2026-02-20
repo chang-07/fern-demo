@@ -1,9 +1,7 @@
 
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
 
 export interface InsuranceData {
     gl_occurrence: number | null;
@@ -13,50 +11,38 @@ export interface InsuranceData {
 
 export async function extractInsuranceData(markdown: string): Promise<InsuranceData> {
     try {
-        const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [
-                {
-                    role: "system",
-                    content: `You are an expert insurance analyst. Extract the following information from the provided ACORD 25 Certificate of Insurance (in Markdown format):
-            1. General Liability (GL) Occurrence Limit (integer). Look for "EACH OCCURRENCE" under "COMMERCIAL GENERAL LIABILITY".
-            2. Additional Insured status (boolean). Check if there is an "X" or "Y" in the "ADDL INSD" column for GL.
-            3. Policy Expiration Date (ISO string YYYY-MM-DD). Look for the GL policy expiration date.
-    
-            Return valid JSON only. format:
-            {
-              "gl_occurrence": number | null,
-              "additional_insured": boolean | null,
-              "expiry_date": string | null
-            }`
-                },
-                {
-                    role: "user",
-                    content: markdown
-                }
-            ],
-            response_format: { type: "json_object" }
-        });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-        const content = completion.choices[0].message.content;
-        if (!content) {
-            throw new Error("Failed to extract data from OpenAI");
+        const prompt = `
+        You are an expert insurance analyst. Extract the following information from the provided ACORD 25 Certificate of Insurance (in Markdown format):
+        1. General Liability (GL) Occurrence Limit (integer). Look for "EACH OCCURRENCE" under "COMMERCIAL GENERAL LIABILITY".
+        2. Additional Insured status (boolean). Check if there is an "X" or "Y" in the "ADDL INSD" column for GL.
+        3. Policy Expiration Date (ISO string YYYY-MM-DD). Look for the GL policy expiration date.
+
+        Return valid JSON only. format:
+        {
+          "gl_occurrence": number | null,
+          "additional_insured": boolean | null,
+          "expiry_date": string | null
         }
+        
+        Markdown Content:
+        ${markdown}
+        `;
 
-        return JSON.parse(content) as InsuranceData;
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        // Clean up markdown code blocks if present
+        const jsonString = text.replace(/```json\n|\n```/g, "").trim();
+
+        return JSON.parse(jsonString) as InsuranceData;
+
     } catch (error: any) {
-        console.error("OpenAI API Error:", error);
+        console.error("Gemini API Error:", error);
 
-        // Fallback mock data for demo purposes when API quota is hit
-        if (error?.status === 429 || error?.code === 'insufficient_quota') {
-            console.warn("Returning mock data due to OpenAI quota limit.");
-            return {
-                gl_occurrence: 1000000,
-                additional_insured: true,
-                expiry_date: "2025-12-31"
-            };
-        }
-
-        throw error;
+        // Fallback or rethrow
+        throw new Error("Failed to extract data: " + error.message);
     }
 }
