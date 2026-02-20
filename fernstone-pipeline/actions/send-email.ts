@@ -51,7 +51,7 @@ export async function sendEmailToSubcontractor(subcontractorId: string, subject:
                 <br/>
                 <p><small>You can reply directly to this email to contact the General Contractor.</small></p> 
             `,
-            reply_to: user.email // Allow sub to reply directly to GC
+            replyTo: user.email // Allow sub to reply directly to GC
         })
         return { success: true }
     } catch (error: any) {

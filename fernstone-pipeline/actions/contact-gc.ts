@@ -1,20 +1,15 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { resend } from '@/lib/resend'
 
 export async function contactGC(subcontractorId: string, subject: string, message: string) {
-    // Note: We are using the admin client here because this action is public (by the sub)
-    // and we need to look up the GC email.
-    // However, createClient() as imported is likely the standard client which uses cookies.
-    // For specific sub actions, we should probably verify the token, but here we only have ID.
-    // For simplicity in this demo, we'll allow it but in prod use the token to auth the sub.
-
-    // Actually, let's just use the service role key to look up the GC email securely.
+    // Subcontractors don't have a user session, so we use the Service Role key
+    // to look up the project and GC details securely.
     const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
-    ) as any // Cast to any if needed or use the proper admin client constructor
+    )
 
     // Fetch Subcontractor & GC Email
     const { data: sub } = await supabase
@@ -62,7 +57,7 @@ export async function contactGC(subcontractorId: string, subject: string, messag
                 <br/>
                 <p><small>You can reply directly to this email to contact the subcontractor.</small></p> 
             `,
-            reply_to: sub.email
+            replyTo: sub.email
         })
         return { success: true }
     } catch (error: any) {
