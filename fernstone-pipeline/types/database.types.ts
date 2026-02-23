@@ -16,6 +16,9 @@ export type Database = {
                     name: string
                     req_gl_occurrence: number | null
                     req_additional_insured: boolean | null
+                    req_auto_limit: number | null
+                    req_wc_limit: number | null
+                    req_umbrella_limit: number | null
                     requirements: Json | null
                     created_at: string | null
                 }
@@ -25,6 +28,9 @@ export type Database = {
                     name: string
                     req_gl_occurrence?: number | null
                     req_additional_insured?: boolean | null
+                    req_auto_limit?: number | null
+                    req_wc_limit?: number | null
+                    req_umbrella_limit?: number | null
                     requirements?: Json | null
                     created_at?: string | null
                 }
@@ -34,6 +40,9 @@ export type Database = {
                     name?: string
                     req_gl_occurrence?: number | null
                     req_additional_insured?: boolean | null
+                    req_auto_limit?: number | null
+                    req_wc_limit?: number | null
+                    req_umbrella_limit?: number | null
                     requirements?: Json | null
                     created_at?: string | null
                 }
@@ -80,9 +89,15 @@ export type Database = {
                     sub_id: string
                     extracted_gl_limit: number | null
                     has_additional_insured: boolean | null
+                    extracted_auto_limit: number | null
+                    has_any_auto: boolean | null
+                    extracted_wc_limit: number | null
+                    wc_statutory_limits: boolean | null
+                    extracted_umbrella_limit: number | null
                     expiry_date: string | null
                     raw_ai_output: Json | null
                     is_compliant: boolean | null
+                    deficiencies: Json | null
                     created_at: string | null
                 }
                 Insert: {
@@ -90,9 +105,15 @@ export type Database = {
                     sub_id: string
                     extracted_gl_limit?: number | null
                     has_additional_insured?: boolean | null
+                    extracted_auto_limit?: number | null
+                    has_any_auto?: boolean | null
+                    extracted_wc_limit?: number | null
+                    wc_statutory_limits?: boolean | null
+                    extracted_umbrella_limit?: number | null
                     expiry_date?: string | null
                     raw_ai_output?: Json | null
                     is_compliant?: boolean | null
+                    deficiencies?: Json | null
                     created_at?: string | null
                 }
                 Update: {
@@ -100,6 +121,11 @@ export type Database = {
                     sub_id?: string
                     extracted_gl_limit?: number | null
                     has_additional_insured?: boolean | null
+                    extracted_auto_limit?: number | null
+                    has_any_auto?: boolean | null
+                    extracted_wc_limit?: number | null
+                    wc_statutory_limits?: boolean | null
+                    extracted_umbrella_limit?: number | null
                     expiry_date?: string | null
                     raw_ai_output?: Json | null
                     is_compliant?: boolean | null

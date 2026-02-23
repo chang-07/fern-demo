@@ -6,8 +6,8 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen bg-slate-900 text-slate-50">
-            <nav className="border-b border-slate-800 bg-slate-950 p-4">
+        <div className="min-h-screen bg-transparent text-foreground">
+            <nav className="border-b border-border bg-background/50 backdrop-blur-md p-4">
                 <div className="container mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className="relative h-8 w-8">

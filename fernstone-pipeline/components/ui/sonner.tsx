@@ -19,6 +19,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       className="toaster group"
       richColors
       closeButton
+      expand={true}
       visibleToasts={5}
       icons={{
         success: <CircleCheckIcon className="size-4" />,

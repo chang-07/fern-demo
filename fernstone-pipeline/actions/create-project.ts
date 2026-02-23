@@ -67,6 +67,9 @@ export async function createProject(formData: FormData) {
             gc_id: user.id,
             name,
             req_gl_occurrence: glOccurrence,
+            req_auto_limit: getNum('auto_csl', null as any),
+            req_wc_limit: getNum('wc_el_accident', null as any),
+            req_umbrella_limit: getNum('umbrella_occ', null as any),
             requirements
         })
 

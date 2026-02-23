@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary selection:text-white">
+    <div className="min-h-screen bg-transparent text-foreground flex flex-col font-sans selection:bg-primary selection:text-white">
       {/* Header */}
       <header className="fixed top-0 w-full z-50 border-b border-white/5 bg-background/80 backdrop-blur-xl">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
@@ -96,7 +96,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="border-t border-white/5 bg-background py-8 text-center">
+      <footer className="border-t border-white/5 bg-transparent py-8 text-center">
         <p className="text-sm text-muted-foreground">
           &copy; {new Date().getFullYear()} Fernstone Inc. All rights reserved.
         </p>

@@ -1,4 +1,5 @@
 
+import Image from "next/image"
 import { createClient } from "@/utils/supabase/server"
 import { notFound } from "next/navigation"
 import { UploadCard } from "@/components/UploadCard"
@@ -22,7 +23,8 @@ export default async function VerifyPage({ params }: { params: Promise<{ token: 
       compliance_reports (
         is_compliant,
         extracted_gl_limit,
-        has_additional_insured
+        has_additional_insured,
+        deficiencies
       )
     `)
         .eq("magic_link_token", token)
@@ -36,12 +38,19 @@ export default async function VerifyPage({ params }: { params: Promise<{ token: 
     const report = sub.compliance_reports?.[0]
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-50 flex flex-col">
-            <header className="border-b border-slate-800 bg-slate-900 p-4">
+        <div className="min-h-screen bg-transparent text-foreground flex flex-col">
+            <header className="border-b border-border bg-background/50 backdrop-blur-md p-4">
                 <div className="container mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded bg-emerald-500" />
-                        <span className="text-xl font-bold tracking-tight text-white">Fernstone</span>
+                        <div className="relative h-8 w-8">
+                            <Image
+                                src="/logo.avif"
+                                alt="Fernstone Logo"
+                                fill
+                                className="object-contain"
+                            />
+                        </div>
+                        <span className="text-xl font-serif font-medium tracking-tight text-white">Fernstone</span>
                     </div>
                 </div>
             </header>
@@ -78,15 +87,11 @@ export default async function VerifyPage({ params }: { params: Promise<{ token: 
                             <div className="space-y-2 text-sm text-slate-300">
                                 <p>We analyzed your COI and found the following issues:</p>
                                 <ul className="list-disc pl-5 space-y-1">
-                                    {report.extracted_gl_limit && report.extracted_gl_limit < (project.req_gl_occurrence || 0) && (
-                                        <li>
-                                            GL Limit: Found <strong>${report.extracted_gl_limit / 1000000}M</strong>,
-                                            Required <strong>${(project.req_gl_occurrence || 0) / 1000000}M</strong>
+                                    {(report.deficiencies as string[] || []).map((deficiency: string, idx: number) => (
+                                        <li key={idx} className="font-medium">
+                                            {deficiency}
                                         </li>
-                                    )}
-                                    {report.has_additional_insured === false && (
-                                        <li>Missing "Additional Insured" endorsement</li>
-                                    )}
+                                    ))}
                                 </ul>
                             </div>
 

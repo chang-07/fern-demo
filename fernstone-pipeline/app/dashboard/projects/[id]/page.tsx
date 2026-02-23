@@ -32,11 +32,26 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                     </Button>
                 </Link>
                 <div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-wrap">
                         <h1 className="text-2xl font-bold text-white">{project.name}</h1>
                         <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-400">
                             <span className="font-medium text-slate-300">GL:</span> ${(project.req_gl_occurrence || 0) / 1000000}M
                         </div>
+                        {project.req_auto_limit ? (
+                            <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-400">
+                                <span className="font-medium text-slate-300">Auto:</span> ${(project.req_auto_limit) / 1000000}M
+                            </div>
+                        ) : null}
+                        {project.req_wc_limit ? (
+                            <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-400">
+                                <span className="font-medium text-slate-300">WC:</span> ${(project.req_wc_limit) / 1000000}M
+                            </div>
+                        ) : null}
+                        {project.req_umbrella_limit ? (
+                            <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-400">
+                                <span className="font-medium text-slate-300">Umbrella:</span> ${(project.req_umbrella_limit) / 1000000}M
+                            </div>
+                        ) : null}
                     </div>
 
                 </div>

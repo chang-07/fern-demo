@@ -45,7 +45,10 @@ export async function processDocument(subcontractorId: string, filePath: string)
             projects (
                 id,
                 req_gl_occurrence,
-                req_additional_insured
+                req_additional_insured,
+                req_auto_limit,
+                req_wc_limit,
+                req_umbrella_limit
             )
         `)
             .eq('id', subcontractorId)
@@ -65,10 +68,14 @@ export async function processDocument(subcontractorId: string, filePath: string)
         const hasAddlInsured = insuranceData.additional_insured === true
         const isAddlInsuredCompliant = !project.req_additional_insured || hasAddlInsured
 
-        // Check expiry
         const isNotExpired = insuranceData.expiry_date ? new Date(insuranceData.expiry_date) > new Date() : false
 
-        const isCompliant = isLimitCompliant && isAddlInsuredCompliant && isNotExpired
+        // Check Auto, WC, Umbrella 
+        const isAutoCompliant = project.req_auto_limit ? (insuranceData.auto_combined_single_limit || 0) >= project.req_auto_limit : true
+        const isWcCompliant = project.req_wc_limit ? (insuranceData.wc_each_accident || 0) >= project.req_wc_limit : true
+        const isUmbrellaCompliant = project.req_umbrella_limit ? (insuranceData.umbrella_occurrence || 0) >= project.req_umbrella_limit : true
+
+        const isCompliant = isLimitCompliant && isAddlInsuredCompliant && isNotExpired && isAutoCompliant && isWcCompliant && isUmbrellaCompliant
 
         // Calculate Deficiencies
         const deficiencies: string[] = []
@@ -81,6 +88,15 @@ export async function processDocument(subcontractorId: string, filePath: string)
         if (!isNotExpired) {
             deficiencies.push(`Policy is expired (Expired: ${insuranceData.expiry_date})`)
         }
+        if (!isAutoCompliant) {
+            deficiencies.push(`Auto Liability Limit ($${(insuranceData.auto_combined_single_limit || 0).toLocaleString()}) is below required ($${project.req_auto_limit.toLocaleString()})`)
+        }
+        if (!isWcCompliant) {
+            deficiencies.push(`Workers Comp Limit ($${(insuranceData.wc_each_accident || 0).toLocaleString()}) is below required ($${project.req_wc_limit.toLocaleString()})`)
+        }
+        if (!isUmbrellaCompliant) {
+            deficiencies.push(`Umbrella Limit ($${(insuranceData.umbrella_occurrence || 0).toLocaleString()}) is below required ($${project.req_umbrella_limit.toLocaleString()})`)
+        }
 
         // 6. Save Compliance Report
         // First, check if report exists? Schema ID is UUID default gen.
@@ -92,6 +108,11 @@ export async function processDocument(subcontractorId: string, filePath: string)
                 sub_id: subcontractorId,
                 extracted_gl_limit: glLimit,
                 has_additional_insured: hasAddlInsured,
+                extracted_auto_limit: insuranceData.auto_combined_single_limit,
+                has_any_auto: insuranceData.auto_has_any_auto,
+                extracted_wc_limit: insuranceData.wc_each_accident,
+                wc_statutory_limits: insuranceData.wc_statutory_limits,
+                extracted_umbrella_limit: insuranceData.umbrella_occurrence,
                 expiry_date: insuranceData.expiry_date,
                 raw_ai_output: insuranceData as any,
                 is_compliant: isCompliant,

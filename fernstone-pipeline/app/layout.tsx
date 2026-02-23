@@ -24,8 +24,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.variable} ${playfair.variable} font-sans bg-background text-foreground antialiased`}>
+    <html lang="en" className="dark min-h-screen">
+      <body className={`${inter.variable} ${playfair.variable} font-sans bg-background text-foreground antialiased min-h-screen
+      bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjA3KSIvPjwvc3ZnPg==')]`}>
         {children}
         <Toaster />
       </body>
