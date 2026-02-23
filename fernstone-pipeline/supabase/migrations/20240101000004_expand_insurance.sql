@@ -11,3 +11,5 @@ ALTER TABLE compliance_reports
   ADD COLUMN extracted_wc_limit INT DEFAULT NULL,
   ADD COLUMN wc_statutory_limits BOOLEAN DEFAULT NULL,
   ADD COLUMN extracted_umbrella_limit INT DEFAULT NULL;
+
+-- Trigger Migration

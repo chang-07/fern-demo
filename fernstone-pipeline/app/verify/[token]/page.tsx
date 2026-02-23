@@ -1,6 +1,6 @@
 
 import Image from "next/image"
-import { createClient } from "@/utils/supabase/server"
+import { createClient } from "@supabase/supabase-js"
 import { notFound } from "next/navigation"
 import { UploadCard } from "@/components/UploadCard"
 import { UpsellButton } from "@/components/UpsellButton"
@@ -9,7 +9,10 @@ import { CheckCircle, AlertTriangle } from "lucide-react"
 
 export default async function VerifyPage({ params }: { params: Promise<{ token: string }> }) {
     const { token } = await params
-    const supabase = await createClient()
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
     // Validate token and fetch subcontractor + project details
     const { data: sub } = await supabase
