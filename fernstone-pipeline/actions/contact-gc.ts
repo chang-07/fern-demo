@@ -43,7 +43,7 @@ export async function contactGC(subcontractorId: string, subject: string, messag
 
     // Send Email
     try {
-        await resend.emails.send({
+        const { data, error } = await resend.emails.send({
             from: 'Fernstone <updates@resend.dev>', // Use resend.dev for testing
             to: [gcUser.email],
             subject: `Subcontractor Question: ${project.name} - ${subject}`,
@@ -59,9 +59,15 @@ export async function contactGC(subcontractorId: string, subject: string, messag
             `,
             replyTo: sub.email
         })
+
+        if (error) {
+            console.error('Send email error from Resend:', error)
+            return { error: `Email Failed: ${error.message}` }
+        }
+
         return { success: true }
     } catch (error: any) {
-        console.error('Send email error:', error)
+        console.error('Send email try/catch error:', error)
         return { error: error.message || 'Failed to send email' }
     }
 }

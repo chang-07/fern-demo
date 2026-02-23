@@ -38,7 +38,7 @@ export async function sendEmailToSubcontractor(subcontractorId: string, subject:
 
     // 3. Send Email
     try {
-        await resend.emails.send({
+        const { data, error: resendError } = await resend.emails.send({
             from: 'Fernstone <updates@resend.dev>', // Use resend.dev for testing
             to: [sub.email],
             subject: `Message from ${project.name}: ${subject}`,
@@ -53,9 +53,15 @@ export async function sendEmailToSubcontractor(subcontractorId: string, subject:
             `,
             replyTo: user.email // Allow sub to reply directly to GC
         })
+
+        if (resendError) {
+            console.error('Resend error:', resendError)
+            return { error: `Email Failed: ${resendError.message}` }
+        }
+
         return { success: true }
     } catch (error: any) {
-        console.error('Send email error:', error)
+        console.error('Send email try/catch error:', error)
         return { error: error.message || 'Failed to send email' }
     }
 }

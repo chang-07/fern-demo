@@ -52,13 +52,13 @@ export default function Home() {
         {/* Primary Actions */}
         <div className="flex flex-col sm:flex-row gap-4">
           <Link href="/dashboard">
-            <Button size="xl" className="h-14 px-8 text-base bg-primary hover:bg-primary/90 text-white rounded-lg shadow-lg shadow-blue-900/20 transition-all flex items-center gap-2">
+            <Button className="h-14 px-8 text-base bg-primary hover:bg-primary/90 text-white rounded-lg shadow-lg shadow-blue-900/20 transition-all flex items-center gap-2">
               <LayoutDashboard className="w-5 h-5" />
               Enter GC Dashboard
             </Button>
           </Link>
           <Link href="/login">
-            <Button size="xl" variant="outline" className="h-14 px-8 text-base border-white/10 hover:bg-white/5 text-white rounded-lg backdrop-blur-sm transition-all">
+            <Button variant="outline" className="h-14 px-8 text-base border-white/10 hover:bg-white/5 text-white rounded-lg backdrop-blur-sm transition-all">
               Sign In
             </Button>
           </Link>

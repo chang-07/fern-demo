@@ -15,7 +15,7 @@ export async function parseInsuranceDoc(fileBuffer: Buffer, fileName: string): P
             apiKey: process.env.LLAMA_CLOUD_API_KEY as string
         });
 
-        const blob = new Blob([fileBuffer]);
+        const blob = new Blob([new Uint8Array(fileBuffer)]);
         const result = await parser.parseFile(blob as any); // Cast as any to avoid DOM File vs Node Blob issues if strictly typed
         return result.markdown;
         await fs.unlink(tempFilePath);

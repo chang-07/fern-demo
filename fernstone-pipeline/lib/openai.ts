@@ -11,7 +11,7 @@ export interface InsuranceData {
 
 export async function extractInsuranceData(markdown: string): Promise<InsuranceData> {
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         const prompt = `
         You are an expert insurance analyst. Extract the following information from the provided ACORD 25 Certificate of Insurance (in Markdown format):

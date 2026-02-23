@@ -63,7 +63,7 @@ export async function inviteSubcontractor(formData: FormData) {
 
     // Send email
     try {
-        await resend.emails.send({
+        const { data, error } = await resend.emails.send({
             from: 'Fernstone <onboarding@resend.dev>', // Use resend.dev for testing unless verified domain
             to: [email],
             subject: `Insurance Verification Required: ${project.name}`,
@@ -75,9 +75,14 @@ export async function inviteSubcontractor(formData: FormData) {
         <p>This is a secure link for your company.</p>
       `
         })
-    } catch (error) {
-        console.error('Email send error:', error)
-        return { error: 'Failed to send invitation email' }
+
+        if (error) {
+            console.error('Resend error:', error)
+            return { error: `Email Failed: ${error.message}` }
+        }
+    } catch (error: any) {
+        console.error('Email send try/catch error:', error)
+        return { error: error.message || 'Failed to send invitation email' }
     }
 
     revalidatePath(`/dashboard/projects/${projectId}`)
