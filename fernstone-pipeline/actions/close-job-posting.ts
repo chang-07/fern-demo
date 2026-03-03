@@ -20,8 +20,8 @@ export async function closeJobPosting(postingId: string) {
 
         if (error) throw error
 
-        revalidatePath('/dashboard/postings')
-        revalidatePath('/subcontractor/market/jobs')
+        revalidatePath('/dashboard/market')
+        revalidatePath('/subcontractor/market')
 
         return { success: true }
     } catch (error: any) {

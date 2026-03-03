@@ -27,8 +27,7 @@ export default function SubcontractorLayout({
                     <div className="flex items-center gap-6">
                         <div className="hidden md:flex items-center gap-6">
                             <a href="/subcontractor" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Dashboard</a>
-                            <a href="/subcontractor/market/jobs" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Job Board</a>
-                            <a href="/subcontractor/market" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Directory</a>
+                            <a href="/subcontractor/market" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Marketplace</a>
                             <a href="/subcontractor/profile" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Profile</a>
                         </div>
                         <UserProfileMenu />

@@ -43,8 +43,7 @@ export default async function DashboardLayout({
 
                         <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
                             <a href="/dashboard" className="hover:text-white transition-colors">Dashboard</a>
-                            <a href="/dashboard/market" className="hover:text-white transition-colors">Market</a>
-                            <a href="/dashboard/postings" className="hover:text-white transition-colors">Job Postings</a>
+                            <a href="/dashboard/market" className="hover:text-white transition-colors">Marketplace</a>
                         </div>
                     </div>
                     <UserProfileMenu />
