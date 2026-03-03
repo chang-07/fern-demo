@@ -9,8 +9,11 @@ import { updateProfile } from "@/actions/update-profile";
 import { toast } from "sonner";
 import { Building2, Save } from "lucide-react";
 
+import { useRouter } from "next/navigation";
+
 export function ProfileForm({ initialProfile }: { initialProfile: any }) {
     const [isSaving, setIsSaving] = useState(false);
+    const router = useRouter();
 
     async function handleSubmit(formData: FormData) {
         setIsSaving(true);
@@ -21,6 +24,7 @@ export function ProfileForm({ initialProfile }: { initialProfile: any }) {
             toast.error(res.error);
         } else {
             toast.success("Profile updated successfully!");
+            router.push('/dashboard/market');
         }
     }
 
