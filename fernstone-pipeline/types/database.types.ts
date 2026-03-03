@@ -56,6 +56,9 @@ export type Database = {
                     id: string
                     project_id: string
                     email: string
+                    company_name: string | null
+                    description: string | null
+                    industry: string | null
                     status: string | null // INVITED, UPLOADED, COMPLIANT, NON_COMPLIANT, APPROVED
                     magic_link_token: string | null
                     created_at: string | null
@@ -64,6 +67,9 @@ export type Database = {
                     id?: string
                     project_id: string
                     email: string
+                    company_name?: string | null
+                    description?: string | null
+                    industry?: string | null
                     status?: string | null
                     magic_link_token?: string | null
                     created_at?: string | null
@@ -72,6 +78,9 @@ export type Database = {
                     id?: string
                     project_id?: string
                     email?: string
+                    company_name?: string | null
+                    description?: string | null
+                    industry?: string | null
                     status?: string | null
                     magic_link_token?: string | null
                     created_at?: string | null

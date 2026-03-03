@@ -39,11 +39,41 @@ export async function seedData() {
 
         // 3. Prepare Mock Subcontractors
         const mockSubs = [
-            { email: 'sarah@apexbuilders.io', status: 'COMPLIANT' }, // 0
-            { email: 'david@reliableplumbing.co', status: 'NON_COMPLIANT' }, // 1 (Minor Auto Gap)
-            { email: 'carlos@skylineelectric.net', status: 'NON_COMPLIANT' }, // 2 (Major GL Gap & Missing Addl Insured)
-            { email: 'emily@horizonroofing.com', status: 'UPLOADED' }, // 3 
-            { email: 'jackson@ironworkers.llc', status: 'INVITED' }, // 4
+            {
+                email: 'sarah@apexbuilders.io',
+                status: 'COMPLIANT',
+                company_name: 'Apex Builders',
+                industry: 'General Contracting',
+                description: 'Full-service commercial construction and renovations.'
+            },
+            {
+                email: 'david@reliableplumbing.co',
+                status: 'NON_COMPLIANT',
+                company_name: 'Reliable Plumbing Co.',
+                industry: 'Plumbing',
+                description: 'Commercial and residential plumbing, pipe fitting, and HVAC.'
+            },
+            {
+                email: 'carlos@skylineelectric.net',
+                status: 'NON_COMPLIANT',
+                company_name: 'Skyline Electric',
+                industry: 'Electrical',
+                description: 'High-voltage wiring, panel upgrades, and smart building integration.'
+            },
+            {
+                email: 'emily@horizonroofing.com',
+                status: 'UPLOADED',
+                company_name: 'Horizon Roofing',
+                industry: 'Roofing',
+                description: 'Flat roofs, shingling, and commercial weatherproofing.'
+            },
+            {
+                email: 'jackson@ironworkers.llc',
+                status: 'INVITED',
+                company_name: 'Jackson Iron Works',
+                industry: 'Steel Erection',
+                description: 'Structural steel fabrication, welding, and erection.'
+            },
         ]
 
         // Insert Subs
