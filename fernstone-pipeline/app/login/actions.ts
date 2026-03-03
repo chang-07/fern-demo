@@ -28,7 +28,7 @@ export async function login(formData: FormData) {
             .single()
 
         if (profile?.role === 'SUBCONTRACTOR') {
-            redirectUrl = '/subcontractor/profile'
+            redirectUrl = '/subcontractor'
         }
     }
 
@@ -70,7 +70,7 @@ export async function signup(formData: FormData) {
     revalidatePath('/', 'layout')
 
     if (role === 'SUBCONTRACTOR') {
-        redirect('/subcontractor/profile')
+        redirect('/subcontractor')
     } else {
         redirect('/dashboard')
     }

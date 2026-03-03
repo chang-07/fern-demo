@@ -17,6 +17,12 @@ export type Database = {
                     company_name: string | null
                     industry: string | null
                     description: string | null
+                    gl_limit: number | null
+                    auto_limit: number | null
+                    wc_limit: number | null
+                    umbrella_limit: number | null
+                    has_additional_insured: boolean | null
+                    expiry_date: string | null
                     created_at: string
                 }
                 Insert: {
@@ -26,6 +32,12 @@ export type Database = {
                     company_name?: string | null
                     industry?: string | null
                     description?: string | null
+                    gl_limit?: number | null
+                    auto_limit?: number | null
+                    wc_limit?: number | null
+                    umbrella_limit?: number | null
+                    has_additional_insured?: boolean | null
+                    expiry_date?: string | null
                     created_at?: string
                 }
                 Update: {
@@ -35,6 +47,12 @@ export type Database = {
                     company_name?: string | null
                     industry?: string | null
                     description?: string | null
+                    gl_limit?: number | null
+                    auto_limit?: number | null
+                    wc_limit?: number | null
+                    umbrella_limit?: number | null
+                    has_additional_insured?: boolean | null
+                    expiry_date?: string | null
                     created_at?: string
                 }
                 Relationships: [

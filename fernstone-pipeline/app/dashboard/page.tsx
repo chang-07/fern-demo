@@ -22,6 +22,16 @@ export default async function DashboardPage() {
         return redirect("/login");
     }
 
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+    if (profile?.role === 'SUBCONTRACTOR') {
+        return redirect('/subcontractor');
+    }
+
     // Fetch projects
     const { data: projects } = await supabase
         .from("projects")

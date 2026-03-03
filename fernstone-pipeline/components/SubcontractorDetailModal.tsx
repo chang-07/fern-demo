@@ -103,7 +103,7 @@ export function SubcontractorDetailModal({ children, subcontractor, showContact 
                             )}
                         </div>
                         <Badge variant="outline" className={
-                            subcontractor.status === 'COMPLIANT' ? "bg-emerald-900/20 text-emerald-500 border-emerald-900" :
+                            subcontractor.status === 'COMPLIANT' || subcontractor.status === 'VERIFIED' ? "bg-emerald-900/20 text-emerald-500 border-emerald-900" :
                                 subcontractor.status === 'APPROVED' ? "bg-blue-900/20 text-blue-500 border-blue-900" :
                                     "bg-amber-900/20 text-amber-500 border-amber-900"
                         }>

@@ -1,11 +1,29 @@
 import Image from "next/image";
 import { UserProfileMenu } from "@/components/UserProfileMenu";
 
-export default function DashboardLayout({
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
+
+export default async function DashboardLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+        if (profile?.role === 'SUBCONTRACTOR') {
+            redirect('/subcontractor');
+        }
+    }
+
     return (
         <div className="min-h-screen bg-transparent text-foreground">
             <nav className="border-b border-border bg-background/50 backdrop-blur-md p-4">

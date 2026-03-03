@@ -99,7 +99,7 @@ export function MarketplaceClient({ initialSubcontractors }: { initialSubcontrac
                                                     <Building2 className="h-3 w-3 mr-1" />
                                                     {sub.industry || 'Unspecified'}
                                                 </Badge>
-                                                {report?.is_compliant ? (
+                                                {report?.is_compliant || sub.status === 'VERIFIED' ? (
                                                     <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Verified</Badge>
                                                 ) : (
                                                     <Badge variant="outline" className="text-slate-500 border-slate-800">Unverified</Badge>
