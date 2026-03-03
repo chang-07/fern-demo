@@ -14,6 +14,7 @@ export type Database = {
                     id: string
                     gc_id: string
                     name: string
+                    status: string | null
                     req_gl_occurrence: number | null
                     req_additional_insured: boolean | null
                     req_auto_limit: number | null
@@ -26,6 +27,7 @@ export type Database = {
                     id?: string
                     gc_id: string
                     name: string
+                    status?: string | null
                     req_gl_occurrence?: number | null
                     req_additional_insured?: boolean | null
                     req_auto_limit?: number | null
@@ -38,6 +40,7 @@ export type Database = {
                     id?: string
                     gc_id?: string
                     name?: string
+                    status?: string | null
                     req_gl_occurrence?: number | null
                     req_additional_insured?: boolean | null
                     req_auto_limit?: number | null
