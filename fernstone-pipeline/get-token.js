@@ -1,0 +1,17 @@
+const { createClient } = require('@supabase/supabase-js');
+const dotenv = require('dotenv');
+dotenv.config({ path: '.env.local' });
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+async function getToken() {
+    const { data, error } = await supabase.from('subcontractors').select('magic_link_token').limit(1);
+    if (error) {
+        console.error("DB_ERROR:", error);
+    } else if (data && data.length > 0) {
+        console.log("TOKEN=" + data[0].magic_link_token);
+    } else {
+        console.log("No subcontractor found.");
+    }
+}
+getToken();
