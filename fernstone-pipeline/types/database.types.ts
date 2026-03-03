@@ -53,7 +53,7 @@ export type Database = {
                     id: string
                     project_id: string
                     email: string
-                    status: string | null
+                    status: string | null // INVITED, UPLOADED, COMPLIANT, NON_COMPLIANT, APPROVED
                     magic_link_token: string | null
                     created_at: string | null
                 }

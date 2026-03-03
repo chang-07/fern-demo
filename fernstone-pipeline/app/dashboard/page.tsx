@@ -7,6 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Users, FileCheck, ShieldAlert, FolderKanban } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ApproveSubcontractorButton } from "@/components/ApproveSubcontractorButton";
+import { SubcontractorDetailModal } from "@/components/SubcontractorDetailModal";
+import { SendReminderButton } from "@/components/SendReminderButton";
 
 export default async function DashboardPage() {
     const supabase = await createClient();
@@ -126,21 +129,21 @@ export default async function DashboardPage() {
                                         const project = sub.projects;
                                         const report = sub.compliance_reports?.[0];
                                         return (
-                                            <div key={sub.id} className="p-4 flex items-center justify-between hover:bg-slate-800/50 transition-colors">
-                                                <div>
-                                                    <div className="font-medium text-slate-200">{sub.email}</div>
-                                                    <div className="text-xs text-slate-400 mt-1 flex gap-2">
-                                                        <span>Project: {project?.name}</span>
-                                                        <span>•</span>
-                                                        <span className="text-emerald-500 font-medium">
-                                                            Verified GL: ${(report?.extracted_gl_limit || 0) / 1000000}M
-                                                        </span>
+                                            <SubcontractorDetailModal key={sub.id} subcontractor={sub}>
+                                                <div className="p-4 flex items-center justify-between hover:bg-slate-800/50 transition-colors cursor-pointer group">
+                                                    <div>
+                                                        <div className="font-medium text-slate-200 group-hover:text-emerald-400 transition-colors">{sub.email}</div>
+                                                        <div className="text-xs text-slate-400 mt-1 flex gap-2">
+                                                            <span>Project: {project?.name}</span>
+                                                            <span>•</span>
+                                                            <span className="text-emerald-500 font-medium">
+                                                                Verified GL: ${(report?.extracted_gl_limit || 0) / 1000000}M
+                                                            </span>
+                                                        </div>
                                                     </div>
+                                                    <ApproveSubcontractorButton subcontractorId={sub.id} />
                                                 </div>
-                                                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
-                                                    Approve
-                                                </Button>
-                                            </div>
+                                            </SubcontractorDetailModal>
                                         )
                                     })}
                                 </div>
@@ -168,29 +171,29 @@ export default async function DashboardPage() {
                                         const project = sub.projects;
                                         const report = sub.compliance_reports?.[0];
                                         return (
-                                            <div key={sub.id} className="p-4 hover:bg-slate-800/50 transition-colors">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <div className="font-medium text-slate-200">{sub.email}</div>
-                                                    <Badge variant="outline" className="bg-amber-900/20 text-amber-500 border-amber-900">
-                                                        Gap Detected
-                                                    </Badge>
-                                                </div>
-                                                <div className="text-xs text-slate-400 mb-2">
-                                                    Project: <span className="text-slate-300">{project?.name}</span>
-                                                </div>
-                                                {report?.deficiencies?.length > 0 && (
-                                                    <div className="bg-slate-950 p-2 text-xs rounded border border-slate-800 text-amber-400/80 mb-3 space-y-1">
-                                                        {report.deficiencies.map((def: string, i: number) => (
-                                                            <div key={i}>• {def}</div>
-                                                        ))}
+                                            <SubcontractorDetailModal key={sub.id} subcontractor={sub}>
+                                                <div className="p-4 hover:bg-slate-800/50 transition-colors cursor-pointer group">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <div className="font-medium text-slate-200 group-hover:text-amber-400 transition-colors">{sub.email}</div>
+                                                        <Badge variant="outline" className="bg-amber-900/20 text-amber-500 border-amber-900">
+                                                            Gap Detected
+                                                        </Badge>
                                                     </div>
-                                                )}
-                                                <div className="flex gap-2">
-                                                    <Button size="sm" variant="outline" className="w-full text-xs text-slate-300 border-slate-700 hover:bg-slate-800">
-                                                        Send Reminder
-                                                    </Button>
+                                                    <div className="text-xs text-slate-400 mb-2">
+                                                        Project: <span className="text-slate-300">{project?.name}</span>
+                                                    </div>
+                                                    {report?.deficiencies?.length > 0 && (
+                                                        <div className="bg-slate-950 p-2 text-xs rounded border border-slate-800 text-amber-400/80 mb-3 space-y-1">
+                                                            {report.deficiencies.map((def: string, i: number) => (
+                                                                <div key={i}>• {def}</div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    <div className="flex gap-2">
+                                                        <SendReminderButton />
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            </SubcontractorDetailModal>
                                         )
                                     })}
                                 </div>
