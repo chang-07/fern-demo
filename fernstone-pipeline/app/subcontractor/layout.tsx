@@ -11,7 +11,7 @@ export default function SubcontractorLayout({
             <nav className="border-b border-border bg-background/50 backdrop-blur-md p-4">
                 <div className="container mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="relative h-8 w-8">
+                        <div className="relative h-8 w-8 -mt-1">
                             <Image
                                 src="/logo.avif"
                                 alt="Fernstone Logo"

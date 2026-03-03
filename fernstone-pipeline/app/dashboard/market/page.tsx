@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { MarketplaceClient } from "@/components/MarketplaceClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CreateJobPostingModal } from "@/components/CreateJobPostingModal"
+import { DeleteJobPostingButton } from "@/components/DeleteJobPostingButton"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Briefcase, Calendar, Building2, Users } from "lucide-react"
@@ -110,9 +111,12 @@ export default async function MarketPage() {
                             </div>
                         ) : (
                             postings.map((job) => (
-                                <Card key={job.id} className="bg-slate-900/50 border-slate-800">
-                                    <CardHeader className="pb-4">
-                                        <div className="flex justify-between items-start mb-2">
+                                <Card key={job.id} className="bg-slate-900/50 border-slate-800 flex flex-col relative">
+                                    <div className="absolute top-4 right-4 z-10">
+                                        <DeleteJobPostingButton postingId={job.id} />
+                                    </div>
+                                    <CardHeader className="pb-4 pr-12">
+                                        <div className="flex flex-wrap gap-2 items-start mb-2">
                                             <Badge variant="outline" className="bg-slate-800/50 text-slate-300 border-slate-700">
                                                 <Building2 className="h-3 w-3 mr-1" />
                                                 {job.industry_focus}

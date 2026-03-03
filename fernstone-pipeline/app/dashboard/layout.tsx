@@ -30,7 +30,7 @@ export default async function DashboardLayout({
                 <div className="container mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-8">
                         <div className="flex items-center gap-2">
-                            <div className="relative h-8 w-8">
+                            <div className="relative h-8 w-8 -mt-1">
                                 <Image
                                     src="/logo.avif"
                                     alt="Fernstone Logo"

@@ -1,8 +1,10 @@
+"use client"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { ArrowRight, ShieldCheck, Users } from "lucide-react"
+import { DeleteProjectButton } from "@/components/DeleteProjectButton"
 
 export function ProjectList({ projects }: { projects: any[] }) {
     if (!projects || projects.length === 0) {
@@ -22,14 +24,21 @@ export function ProjectList({ projects }: { projects: any[] }) {
                     <Card className="bg-slate-800 border-slate-700 hover:border-emerald-500/50 transition-colors group cursor-pointer h-full">
                         <CardHeader className="flex flex-col items-start justify-between space-y-2 pb-2">
                             <div className="flex w-full justify-between items-start">
-                                <CardTitle className="text-base font-semibold text-slate-200 leading-tight">
-                                    {project.name}
-                                </CardTitle>
-                                <CardDescription className="text-xs text-slate-400 mt-1">
-                                    Coverage: ${(project.req_gl_occurrence || 0) / 1000000}M GL / ${(project.requirements?.gl?.aggregate || 0) / 1000000}M Agg
-                                </CardDescription>
+                                <div>
+                                    <CardTitle className="text-base font-semibold text-slate-200 leading-tight">
+                                        {project.name}
+                                    </CardTitle>
+                                    <CardDescription className="text-xs text-slate-400 mt-1">
+                                        Coverage: ${(project.req_gl_occurrence || 0) / 1000000}M GL / ${(project.requirements?.gl?.aggregate || 0) / 1000000}M Agg
+                                    </CardDescription>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                                    <div onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+                                        <DeleteProjectButton projectId={project.id} />
+                                    </div>
+                                </div>
                             </div>
-                            <ShieldCheck className="h-4 w-4 text-emerald-500" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold text-white">0</div>

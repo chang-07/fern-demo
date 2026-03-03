@@ -77,40 +77,50 @@ export default async function DashboardPage() {
 
             {/* Metrics Ribbon */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card className="bg-slate-900 border-slate-800">
+                <Card className="bg-slate-900 border-slate-800 hover:-translate-y-1 hover:border-slate-700 transition-all duration-300 shadow-sm hover:shadow-slate-800/50">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium text-slate-400">Total Projects</CardTitle>
                         <FolderKanban className="h-4 w-4 text-slate-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-white">{projects?.length || 0}</div>
+                        <div className="text-3xl font-bold text-white tracking-tight">{projects?.length || 0}</div>
                     </CardContent>
                 </Card>
-                <Card className="bg-slate-900 border-slate-800">
+                <Card className="bg-slate-900 border-slate-800 hover:-translate-y-1 hover:border-slate-700 transition-all duration-300 shadow-sm hover:shadow-slate-800/50">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium text-slate-400">Network Contractors</CardTitle>
                         <Users className="h-4 w-4 text-slate-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-white">{totalSubs}</div>
+                        <div className="text-3xl font-bold text-white tracking-tight">{totalSubs}</div>
                     </CardContent>
                 </Card>
-                <Card className="bg-slate-900 border-slate-800">
+                <Card className="bg-slate-900 border-slate-800 hover:-translate-y-1 hover:border-emerald-500/30 transition-all duration-300 shadow-sm hover:shadow-emerald-900/20">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium text-slate-400">Ready to Approve</CardTitle>
                         <FileCheck className="h-4 w-4 text-emerald-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-emerald-400">{compliantSubs.length}</div>
+                        <div className="text-3xl font-bold text-emerald-400 tracking-tight">{compliantSubs.length}</div>
                     </CardContent>
                 </Card>
-                <Card className="bg-slate-900 border-slate-800">
+                <Card className="bg-slate-900 border-slate-800 hover:-translate-y-1 hover:border-blue-500/30 transition-all duration-300 shadow-sm hover:shadow-blue-900/20">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium text-slate-400">Compliance Rate</CardTitle>
-                        <div className={`h-4 w-4 rounded-full ${complianceRate > 80 ? 'bg-emerald-500' : complianceRate > 50 ? 'bg-amber-500' : 'bg-red-500'}`} />
                     </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-white">{complianceRate}%</div>
+                    <CardContent className="space-y-3">
+                        <div className="flex items-baseline gap-2">
+                            <div className="text-3xl font-bold tracking-tight bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent">
+                                {complianceRate}%
+                            </div>
+                        </div>
+                        <div className="h-2.5 w-full bg-slate-950 rounded-full overflow-hidden shadow-inner border border-slate-800/50">
+                            <div
+                                className={`h-full transition-all duration-1000 ease-out rounded-full ${complianceRate > 80 ? 'bg-emerald-500' : complianceRate > 50 ? 'bg-amber-500' : 'bg-red-500'
+                                    }`}
+                                style={{ width: `${complianceRate}%` }}
+                            />
+                        </div>
                     </CardContent>
                 </Card>
             </div>
