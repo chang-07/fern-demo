@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import {
     Dialog,
     DialogContent,
@@ -8,16 +9,44 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, XCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { CheckCircle2, XCircle, Mail, Send } from "lucide-react"
+import { contactSubcontractor } from "@/actions/contact-subcontractor"
+import { toast } from "sonner"
 
 interface SubcontractorDetailModalProps {
     children: React.ReactNode;
     subcontractor: any; // Subcontractor with embedded project and compliance report
+    showContact?: boolean;
 }
 
-export function SubcontractorDetailModal({ children, subcontractor }: SubcontractorDetailModalProps) {
+export function SubcontractorDetailModal({ children, subcontractor, showContact = false }: SubcontractorDetailModalProps) {
     const project = subcontractor.projects;
     const report = subcontractor.compliance_reports?.[0];
+
+    const [isContacting, setIsContacting] = useState(false);
+    const [message, setMessage] = useState("");
+    const [isSending, setIsSending] = useState(false);
+
+    const handleContact = async () => {
+        if (!message.trim()) {
+            toast.error("Please enter a message.");
+            return;
+        }
+
+        setIsSending(true);
+        const res = await contactSubcontractor(subcontractor.id, subcontractor.email, message);
+        setIsSending(false);
+
+        if (res.error) {
+            toast.error(res.error);
+        } else {
+            toast.success("Message sent successfully!");
+            setIsContacting(false);
+            setMessage("");
+        }
+    };
 
     const formatLimit = (value: number | undefined | null) => {
         if (value === null || value === undefined) return "N/A"
@@ -58,14 +87,21 @@ export function SubcontractorDetailModal({ children, subcontractor }: Subcontrac
     }
 
     return (
-        <Dialog>
+        <Dialog onOpenChange={(open) => { if (!open) setIsContacting(false) }}>
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-lg bg-slate-900 border-slate-800 text-white">
+            <DialogContent className="sm:max-w-lg bg-slate-900 border-slate-800 text-white max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <div className="flex items-center justify-between mt-2">
-                        <DialogTitle className="text-xl">{subcontractor.email}</DialogTitle>
+                        <div>
+                            <DialogTitle className="text-xl">
+                                {subcontractor.company_name || subcontractor.email}
+                            </DialogTitle>
+                            {subcontractor.company_name && (
+                                <p className="text-sm text-slate-400 mt-1">{subcontractor.email}</p>
+                            )}
+                        </div>
                         <Badge variant="outline" className={
                             subcontractor.status === 'COMPLIANT' ? "bg-emerald-900/20 text-emerald-500 border-emerald-900" :
                                 subcontractor.status === 'APPROVED' ? "bg-blue-900/20 text-blue-500 border-blue-900" :
@@ -76,9 +112,17 @@ export function SubcontractorDetailModal({ children, subcontractor }: Subcontrac
                     </div>
                 </DialogHeader>
 
-                <div className="mt-6">
+                <div className="mt-4">
+                    {subcontractor.description && (
+                        <div className="mb-4 text-sm text-slate-300 bg-slate-800/30 p-3 rounded-lg border border-slate-800">
+                            {subcontractor.description}
+                        </div>
+                    )}
+
                     <div className="mb-4">
-                        <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Coverage Breakdown</h4>
+                        <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">
+                            Coverage Breakdown {project?.name && `(vs ${project.name})`}
+                        </h4>
 
                         <div className="bg-slate-950 rounded-lg border border-slate-800 p-4">
                             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
@@ -112,6 +156,54 @@ export function SubcontractorDetailModal({ children, subcontractor }: Subcontrac
                     {report && report.expiry_date && (
                         <div className="mt-4 text-xs text-slate-500 text-right">
                             Policy Expiry: <span className="text-slate-400">{new Date(report.expiry_date).toLocaleDateString()}</span>
+                        </div>
+                    )}
+
+                    {showContact && (
+                        <div className="mt-6 pt-6 border-t border-slate-800">
+                            {!isContacting ? (
+                                <Button
+                                    onClick={() => setIsContacting(true)}
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                                >
+                                    <Mail className="w-4 h-4 mr-2" />
+                                    Contact Contractor
+                                </Button>
+                            ) : (
+                                <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2">
+                                    <h4 className="text-sm font-semibold text-slate-300">Send Message</h4>
+                                    <Textarea
+                                        placeholder="Hi, I'm interested in working with you on an upcoming project..."
+                                        value={message}
+                                        onChange={(e) => setMessage(e.target.value)}
+                                        className="bg-slate-950 border-slate-800 text-slate-200 resize-none h-24"
+                                    />
+                                    <div className="flex gap-2 justify-end">
+                                        <Button
+                                            variant="ghost"
+                                            onClick={() => {
+                                                setIsContacting(false);
+                                                setMessage("");
+                                            }}
+                                            className="text-slate-400 hover:text-white"
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            onClick={handleContact}
+                                            disabled={isSending || !message.trim()}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                                        >
+                                            {isSending ? "Sending..." : (
+                                                <>
+                                                    <Send className="w-4 h-4 mr-2" />
+                                                    Send Note
+                                                </>
+                                            )}
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

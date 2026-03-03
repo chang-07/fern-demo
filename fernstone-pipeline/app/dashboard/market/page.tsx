@@ -22,13 +22,24 @@ export default async function MarketPage() {
             industry,
             description,
             status,
+            projects (
+                id,
+                name,
+                req_gl_occurrence,
+                req_additional_insured,
+                req_auto_limit,
+                req_wc_limit,
+                req_umbrella_limit
+            ),
             compliance_reports (
                 extracted_gl_limit,
                 has_additional_insured,
                 extracted_auto_limit,
                 extracted_wc_limit,
                 extracted_umbrella_limit,
-                is_compliant
+                is_compliant,
+                deficiencies,
+                expiry_date
             )
         `)
         .order('created_at', { ascending: false });
@@ -37,23 +48,8 @@ export default async function MarketPage() {
         console.error("Error fetching market data:", error);
     }
 
-    // Process the data so each subcontractor has a single "latest" report associated with it for the UI
-    const processedSubs = (subcontractors || []).map(sub => {
-        // Find the most complete/latest report if there are multiple.
-        // For simplicity, we just take the first one returned (or null)
-        const reports = sub.compliance_reports as any[];
-        const report = reports && reports.length > 0 ? reports[0] : null;
-
-        return {
-            id: sub.id,
-            company_name: sub.company_name || 'Unknown Company',
-            industry: sub.industry || 'Unspecified',
-            description: sub.description || 'No description provided.',
-            email: sub.email,
-            status: sub.status,
-            report
-        };
-    });
+    // Pass the raw data structure directly so SubcontractorDetailModal can parse it properly
+    const processedSubs = subcontractors || [];
 
     return (
         <div className="space-y-6">

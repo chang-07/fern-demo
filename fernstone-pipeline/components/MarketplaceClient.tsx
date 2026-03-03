@@ -12,15 +12,18 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
+import { SubcontractorDetailModal } from "@/components/SubcontractorDetailModal";
+
 // Simplified type for the marketplace view
 type MarketSubcontractor = {
     id: string;
-    company_name: string;
-    industry: string;
-    description: string;
+    company_name: string | null;
+    industry: string | null;
+    description: string | null;
     email: string;
     status: string | null;
-    report: any; // Using any for simplicity here to parse compliance_reports
+    projects: any;
+    compliance_reports: any[];
 };
 
 export function MarketplaceClient({ initialSubcontractors }: { initialSubcontractors: MarketSubcontractor[] }) {
@@ -32,16 +35,17 @@ export function MarketplaceClient({ initialSubcontractors }: { initialSubcontrac
         // Text Match (Company Name, Description, Industry, Email)
         const lowerQuery = searchQuery.toLowerCase();
         const matchesText =
-            sub.company_name.toLowerCase().includes(lowerQuery) ||
-            sub.description.toLowerCase().includes(lowerQuery) ||
-            sub.industry.toLowerCase().includes(lowerQuery) ||
+            (sub.company_name || "").toLowerCase().includes(lowerQuery) ||
+            (sub.description || "").toLowerCase().includes(lowerQuery) ||
+            (sub.industry || "").toLowerCase().includes(lowerQuery) ||
             sub.email.toLowerCase().includes(lowerQuery);
 
         // GL Coverage Match
         let matchesCoverage = true;
+        const report = sub.compliance_reports?.[0];
         if (minGlFilter !== "all") {
             const minRequiredAmount = parseInt(minGlFilter);
-            const subGlAmount = sub.report?.extracted_gl_limit || 0;
+            const subGlAmount = report?.extracted_gl_limit || 0;
             matchesCoverage = subGlAmount >= minRequiredAmount;
         }
 
@@ -83,45 +87,52 @@ export function MarketplaceClient({ initialSubcontractors }: { initialSubcontrac
                         No contractors found matching your criteria.
                     </div>
                 ) : (
-                    filteredSubs.map((sub) => (
-                        <Card key={sub.id} className="bg-slate-900/50 border-slate-800 hover:border-slate-700 transition-colors flex flex-col">
-                            <CardHeader className="pb-4">
-                                <div className="flex justify-between items-start mb-2">
-                                    <Badge variant="outline" className="bg-slate-800/50 text-slate-300 border-slate-700">
-                                        <Building2 className="h-3 w-3 mr-1" />
-                                        {sub.industry}
-                                    </Badge>
-                                    {sub.report?.is_compliant ? (
-                                        <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Verified</Badge>
-                                    ) : (
-                                        <Badge variant="outline" className="text-slate-500 border-slate-800">Unverified</Badge>
-                                    )}
+                    filteredSubs.map((sub) => {
+                        const report = sub.compliance_reports?.[0];
+                        return (
+                            <SubcontractorDetailModal key={sub.id} subcontractor={sub} showContact={true}>
+                                <div className="cursor-pointer group flex flex-col h-full">
+                                    <Card className="bg-slate-900/50 border-slate-800 group-hover:border-slate-600 transition-colors flex flex-col flex-1">
+                                        <CardHeader className="pb-4">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <Badge variant="outline" className="bg-slate-800/50 text-slate-300 border-slate-700">
+                                                    <Building2 className="h-3 w-3 mr-1" />
+                                                    {sub.industry || 'Unspecified'}
+                                                </Badge>
+                                                {report?.is_compliant ? (
+                                                    <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Verified</Badge>
+                                                ) : (
+                                                    <Badge variant="outline" className="text-slate-500 border-slate-800">Unverified</Badge>
+                                                )}
+                                            </div>
+                                            <CardTitle className="text-xl text-white">{sub.company_name || 'Unknown Company'}</CardTitle>
+                                            <CardDescription className="text-slate-400 line-clamp-2 mt-2 leading-relaxed">
+                                                {sub.description || 'No description available.'}
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="mt-auto pt-4 border-t border-slate-800/50">
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between text-sm">
+                                                    <span className="text-slate-500">GL Limit</span>
+                                                    <span className="font-medium text-slate-200">
+                                                        {report?.extracted_gl_limit
+                                                            ? `$${(report.extracted_gl_limit / 1000000).toFixed(1)}M`
+                                                            : 'Unknown'}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between text-sm">
+                                                    <span className="text-slate-500">Contact</span>
+                                                    <span className="text-slate-300 truncate ml-4" title={sub.email}>
+                                                        {sub.email}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
                                 </div>
-                                <CardTitle className="text-xl text-white">{sub.company_name}</CardTitle>
-                                <CardDescription className="text-slate-400 line-clamp-2 mt-2 leading-relaxed">
-                                    {sub.description}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="mt-auto pt-4 border-t border-slate-800/50">
-                                <div className="space-y-3">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500">GL Limit</span>
-                                        <span className="font-medium text-slate-200">
-                                            {sub.report?.extracted_gl_limit
-                                                ? `$${(sub.report.extracted_gl_limit / 1000000).toFixed(1)}M`
-                                                : 'Unknown'}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-slate-500">Contact</span>
-                                        <span className="text-slate-300 truncate ml-4" title={sub.email}>
-                                            {sub.email}
-                                        </span>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))
+                            </SubcontractorDetailModal>
+                        );
+                    })
                 )}
             </div>
         </div>
