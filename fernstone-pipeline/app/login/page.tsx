@@ -41,6 +41,21 @@ export default async function LoginPage(props: { searchParams: Promise<{ error?:
                             <Label htmlFor="email" className="text-slate-200">Email</Label>
                             <Input id="email" name="email" type="email" placeholder="m@example.com" required className="bg-slate-950 border-slate-800 text-white placeholder:text-slate-500" />
                         </div>
+
+                        <div className="grid gap-2">
+                            <Label className="text-slate-200">I am a...</Label>
+                            <div className="flex flex-col sm:flex-row gap-4 mt-1">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="role" value="GC" defaultChecked className="text-emerald-500 bg-slate-950 border-slate-800" />
+                                    <span className="text-sm text-slate-300">General Contractor</span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="role" value="SUBCONTRACTOR" className="text-emerald-500 bg-slate-950 border-slate-800" />
+                                    <span className="text-sm text-slate-300">Subcontractor</span>
+                                </label>
+                            </div>
+                        </div>
+
                         <div className="grid gap-2">
                             <Label htmlFor="password" className="text-slate-200">Password</Label>
                             <Input id="password" name="password" type="password" required className="bg-slate-950 border-slate-800 text-white" />
