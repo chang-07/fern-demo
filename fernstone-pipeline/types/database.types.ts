@@ -197,7 +197,7 @@ export type Database = {
                     expiry_date?: string | null
                     raw_ai_output?: Json | null
                     is_compliant?: boolean | null
-                    created_at?: string | null
+                    created_at: string | null
                 }
                 Relationships: [
                     {
@@ -205,6 +205,54 @@ export type Database = {
                         columns: ["sub_id"]
                         isOneToOne: false
                         referencedRelation: "subcontractors"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            }
+            job_postings: {
+                Row: {
+                    id: string
+                    gc_id: string
+                    project_id: string | null
+                    title: string
+                    description: string | null
+                    industry_focus: string | null
+                    status: string | null
+                    created_at: string | null
+                }
+                Insert: {
+                    id?: string
+                    gc_id: string
+                    project_id?: string | null
+                    title: string
+                    description?: string | null
+                    industry_focus?: string | null
+                    status?: string | null
+                    created_at?: string | null
+                }
+                Update: {
+                    id?: string
+                    gc_id?: string
+                    project_id?: string | null
+                    title?: string
+                    description?: string | null
+                    industry_focus?: string | null
+                    status?: string | null
+                    created_at?: string | null
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "job_postings_gc_id_fkey"
+                        columns: ["gc_id"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "job_postings_project_id_fkey"
+                        columns: ["project_id"]
+                        isOneToOne: false
+                        referencedRelation: "projects"
                         referencedColumns: ["id"]
                     }
                 ]
