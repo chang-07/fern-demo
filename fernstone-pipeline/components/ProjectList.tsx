@@ -16,13 +16,13 @@ export function ProjectList({ projects }: { projects: any[] }) {
     }
 
     return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-1">
             {projects.map((project) => (
                 <Link key={project.id} href={`/dashboard/projects/${project.id}`}>
-                    <Card className="bg-slate-800 border-slate-700 hover:border-emerald-500/50 transition-colors group cursor-pointer">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <div>
-                                <CardTitle className="text-sm font-medium text-slate-200">
+                    <Card className="bg-slate-800 border-slate-700 hover:border-emerald-500/50 transition-colors group cursor-pointer h-full">
+                        <CardHeader className="flex flex-col items-start justify-between space-y-2 pb-2">
+                            <div className="flex w-full justify-between items-start">
+                                <CardTitle className="text-base font-semibold text-slate-200 leading-tight">
                                     {project.name}
                                 </CardTitle>
                                 <CardDescription className="text-xs text-slate-400 mt-1">
