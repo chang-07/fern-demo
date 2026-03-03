@@ -13,35 +13,53 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 const mockSubs = [
     {
-        email: 'sarah@apexbuilders.io',
-        company_name: 'Apex Builders',
-        industry: 'General Contracting',
-        description: 'Full-service commercial construction and renovations.'
+        email: 'estimating@summitsteel.com',
+        company_name: 'Summit Structural Steel',
+        industry: 'Structural Steel Erection',
+        description: 'Tier 1 structural steel fabrication and erection for mid to high-rise commercial buildings. AISC certified.'
     },
     {
-        email: 'david@reliableplumbing.co',
-        company_name: 'Reliable Plumbing Co.',
-        industry: 'Plumbing',
-        description: 'Commercial and residential plumbing, pipe fitting, and HVAC.'
+        email: 'bids@blueoceanmep.com',
+        company_name: 'Blue Ocean Plumbing & HVAC',
+        industry: 'Mechanical & Plumbing',
+        description: 'Large-scale commercial plumbing, HVAC installation, and industrial piping. Union shop with 200+ technicians.'
     },
     {
-        email: 'carlos@skylineelectric.net',
-        company_name: 'Skyline Electric',
-        industry: 'Electrical',
-        description: 'High-voltage wiring, panel upgrades, and smart building integration.'
+        email: 'projects@vanguardelectric.net',
+        company_name: 'Vanguard Electrical Systems',
+        industry: 'Commercial Electrical',
+        description: 'High-voltage systems, switchgear installation, telecommunications, and smart-building integrations.'
     },
     {
-        email: 'emily@horizonroofing.com',
-        company_name: 'Horizon Roofing',
-        industry: 'Roofing',
-        description: 'Flat roofs, shingling, and commercial weatherproofing.'
+        email: 'dispatch@precisioncoring.io',
+        company_name: 'Precision Concrete',
+        industry: 'Concrete & Masonry',
+        description: 'Concrete pouring, core drilling, foundation work, and heavy masonry for commercial developments.'
     },
     {
-        email: 'jackson@ironworkers.llc',
-        company_name: 'Jackson Iron Works',
-        industry: 'Steel Erection',
-        description: 'Structural steel fabrication, welding, and erection.'
+        email: 'info@cascaderoofing.co',
+        company_name: 'Cascade Roofing Solutions',
+        industry: 'Commercial Roofing',
+        description: 'TPO, EPDM, and green roof installations. Focuses on LEED-certified weatherproofing.'
     },
+    {
+        email: 'ops@ironcladdemo.com',
+        company_name: 'Ironclad Demolition',
+        industry: 'Demolition & Abatement',
+        description: 'Structural demolition, hazardous materials abatement, and site clearing services.'
+    },
+    {
+        email: 'commercial@evergreenlandscapes.com',
+        company_name: 'Evergreen Hardscapes',
+        industry: 'Landscaping & Hardscape',
+        description: 'Commercial retaining walls, paving, corporate park landscaping, and irrigation systems.'
+    },
+    {
+        email: 'contracts@titanframing.llc',
+        company_name: 'Titan Framing & Drywall',
+        industry: 'Interior Build-out',
+        description: 'Heavy-gauge metal framing, drywall installation, and acoustical ceilings for corporate offices.'
+    }
 ];
 
 async function seedMarketplace() {

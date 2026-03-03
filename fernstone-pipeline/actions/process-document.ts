@@ -99,9 +99,16 @@ export async function processDocument(subcontractorId: string, filePath: string)
         }
 
         // 6. Save Compliance Report
-        // First, check if report exists? Schema ID is UUID default gen.
-        // We can just insert a new one or update.
-        // For simplicity, we insert a new report.
+        // Delete any existing reports for this subcontractor to prevent duplicate data
+        const { error: deleteError } = await supabase
+            .from('compliance_reports')
+            .delete()
+            .eq('sub_id', subcontractorId)
+
+        if (deleteError) {
+            console.error("Warning: Failed to delete old report", deleteError)
+        }
+
         const { error: reportError } = await supabase
             .from('compliance_reports')
             .insert({
