@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { User } from "lucide-react";
 
 export default function DashboardLayout({
     children,
@@ -20,9 +21,10 @@ export default function DashboardLayout({
                         </div>
                         <span className="text-xl font-bold tracking-tight text-white">Fernstone</span>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm text-slate-400">GC Portal</span>
-                        <div className="h-8 w-8 rounded-full bg-slate-800" />
+                    <div className="flex items-center gap-4 cursor-pointer hover:bg-slate-800/50 p-2 rounded-full transition-colors">
+                        <div className="h-8 w-8 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
+                            <User className="h-4 w-4 text-slate-400" />
+                        </div>
                     </div>
                 </div>
             </nav>
