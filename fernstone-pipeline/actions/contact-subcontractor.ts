@@ -1,9 +1,7 @@
 "use server"
 
 import { createClient } from "@/utils/supabase/server"
-import { resend } from "@/lib/resend"
-
-export async function contactSubcontractor(subcontractorId: string, email: string, gcMessage: string) {
+export async function messageSubcontractor(subcontractorId: string, email: string, gcMessage: string) {
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -12,21 +10,28 @@ export async function contactSubcontractor(subcontractorId: string, email: strin
     }
 
     try {
-        await resend.emails.send({
-            from: 'Fernstone <onboarding@resend.dev>',
-            to: [email],
-            subject: `Message from General Contractor`,
-            html: `
-                <p>Hello,</p>
-                <p>A General Contractor has sent you a message regarding your services:</p>
-                <blockquote style="border-left: 4px solid #ccc; padding-left: 1rem; margin: 1rem 0;">
-                    ${gcMessage}
-                </blockquote>
-                <p>Please log in to your Fernstone profile to respond or follow up.</p>
-                <br/>
-                <p>Thank you,<br/>The Fernstone Team</p>
-            `
-        })
+        const { data: profile } = await (supabase as any)
+            .from('profiles')
+            .select('id')
+            .eq('email', email)
+            .single()
+
+        if (profile) {
+            const { error: msgError } = await (supabase as any)
+                .from('messages')
+                .insert({
+                    sender_id: user.id,
+                    receiver_id: profile.id,
+                    subject: `Message from General Contractor`,
+                    body: gcMessage
+                })
+
+            if (msgError) {
+                console.error("Failed to insert message to sub:", msgError)
+            }
+        } else {
+            console.warn("Could not find profile for email to send message:", email)
+        }
 
         return { success: true }
     } catch (error: any) {

@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { resend } from '@/lib/resend'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 
 export async function inviteSubcontractor(formData: FormData) {
@@ -61,28 +61,61 @@ export async function inviteSubcontractor(formData: FormData) {
     console.log(magicLink)
     console.log('----------------------------')
 
-    // Send email
-    try {
-        const { data, error } = await resend.emails.send({
-            from: 'Fernstone <onboarding@resend.dev>', // Use resend.dev for testing unless verified domain
-            to: [email],
-            subject: `Insurance Verification Required: ${project.name}`,
-            html: `
-        <h1>Action Required: Upload Certificate of Insurance</h1>
-        <p>You have been invited to submit your insurance documents for project <strong>${project.name}</strong>.</p>
-        <p>Please click the link below to verify your coverage:</p>
-        <p><a href="${magicLink}">${magicLink}</a></p>
-        <p>This is a secure link for your company.</p>
-      `
-        })
+    // 1. Find or create the user so they can receive the message
+    let receiverId = null
 
-        if (error) {
-            console.warn('Resend demo warning (email not sent, but magic link generated):', error.message)
-            // Do not return { error } here, allow the demo to proceed
+    // Check if profile exists
+    const { data: existingProfile } = await (supabase as any)
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .single()
+
+    if (existingProfile) {
+        receiverId = existingProfile.id
+    } else {
+        // We must use service role to create users directly without needing them to click a confirmation link
+        const adminSupabase = createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+
+        const { data: newAuthUser, error: createUserError } = await adminSupabase.auth.admin.createUser({
+            email: email,
+            email_confirm: true,
+            // Generate a random secure password they'll never use due to magic links
+            password: Math.random().toString(36).slice(-10) + Math.random().toString(36).slice(-10) + "A1!",
+        });
+
+        if (createUserError) {
+            console.error("Failed to create auth user for invite:", createUserError)
+        } else if (newAuthUser.user) {
+            receiverId = newAuthUser.user.id
+            // Create their profile
+            await (adminSupabase as any).from('profiles').insert({
+                id: receiverId,
+                email: email,
+                role: 'SUBCONTRACTOR',
+                company_name: email.split('@')[0], // Placeholder
+                points: 0
+            })
         }
-    } catch (error: any) {
-        console.warn('Email send try/catch warning:', error.message)
-        // Fallback for demo
+    }
+
+    if (receiverId) {
+        // Send internal message
+        const { error: messageError } = await (supabase as any)
+            .from('messages')
+            .insert({
+                sender_id: user.id,
+                receiver_id: receiverId,
+                project_id: projectId,
+                subject: `Insurance Verification Required: ${project.name}`,
+                body: `You have been invited to submit your insurance documents for project ${project.name}.\n\nPlease click the link below to verify your coverage:\n${magicLink}\n\nThis is a secure link for your company.`
+            });
+
+        if (messageError) {
+            console.error("Failed to insert message:", messageError);
+        }
+    } else {
+        console.warn('Could not determine receiverId to send internal message.')
     }
 
     revalidatePath(`/dashboard/projects/${projectId}`)

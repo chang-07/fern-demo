@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, AlertTriangle, Clock, Download } from "lucide-react"
-import { EmailSubcontractorModal } from "@/components/EmailSubcontractorModal"
+import { MessageSubcontractorModal } from "@/components/MessageSubcontractorModal"
 import { SubcontractorTableApproveAction } from "@/components/SubcontractorTableApproveAction"
 
 export async function SubcontractorTable({ projectId, projectStatus }: { projectId: string, projectStatus?: string }) {
@@ -115,7 +115,7 @@ export async function SubcontractorTable({ projectId, projectStatus }: { project
                                                     projectName={(sub.projects as any)?.name}
                                                 />
                                             )}
-                                            <EmailSubcontractorModal
+                                            <MessageSubcontractorModal
                                                 subcontractorId={sub.id}
                                                 subcontractorEmail={sub.email}
                                             />

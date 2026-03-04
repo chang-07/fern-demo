@@ -8,6 +8,7 @@ import Link from "next/link"
 import { InviteSubcontractorModal } from "@/components/InviteSubcontractorModal"
 import { ReopenProjectButton } from "@/components/ReopenProjectButton"
 import { Badge } from "@/components/ui/badge"
+import { MessageList } from "@/components/MessageList"
 
 // Params need to be awaited in Next.js 15
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
@@ -23,6 +24,25 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
     if (!project) {
         notFound()
+    }
+
+    // Fetch messages contextually related to this project where the GC is the receiver
+    const { data: { user } } = await supabase.auth.getUser()
+    let messages = []
+    if (user) {
+        const { data: projectMessages } = await (supabase as any)
+            .from('messages')
+            .select(`
+                *,
+                sender:sender_id ( email )
+            `)
+            .eq('project_id', id)
+            .eq('receiver_id', user.id)
+            .order('created_at', { ascending: false })
+
+        if (projectMessages) {
+            messages = projectMessages
+        }
     }
 
     return (
@@ -70,6 +90,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
             </div>
 
             <SubcontractorTable projectId={id} projectStatus={project.status || undefined} />
+
+            {messages.length > 0 && (
+                <div className="mt-12 space-y-4">
+                    <h2 className="text-xl font-bold text-white mb-4">Project Messages</h2>
+                    <MessageList initialMessages={messages} />
+                </div>
+            )}
         </div>
     )
 }

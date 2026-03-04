@@ -14,11 +14,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Mail, Send } from "lucide-react"
+import { MessageSquare, Send } from "lucide-react"
 import { toast } from "sonner"
-import { sendEmailToSubcontractor } from "@/actions/send-email"
+import { sendMessageToSubcontractor } from "@/actions/send-message"
 
-interface EmailSubcontractorModalProps {
+interface MessageSubcontractorModalProps {
     subcontractorId: string
     subcontractorEmail: string
     defaultSubject?: string
@@ -26,13 +26,13 @@ interface EmailSubcontractorModalProps {
     children?: React.ReactNode
 }
 
-export function EmailSubcontractorModal({
+export function MessageSubcontractorModal({
     subcontractorId,
     subcontractorEmail,
     defaultSubject = "",
     defaultMessage = "",
     children
-}: EmailSubcontractorModalProps) {
+}: MessageSubcontractorModalProps) {
     const [open, setOpen] = useState(false)
     const [subject, setSubject] = useState(defaultSubject)
     const [message, setMessage] = useState(defaultMessage)
@@ -43,11 +43,11 @@ export function EmailSubcontractorModal({
         setLoading(true)
 
         try {
-            const result = await sendEmailToSubcontractor(subcontractorId, subject, message)
+            const result = await sendMessageToSubcontractor(subcontractorId, subject, message)
             if (result?.error) {
                 toast.error(result.error)
             } else {
-                toast.success(`Email sent to ${subcontractorEmail}`)
+                toast.success(`Message sent to ${subcontractorEmail}`)
                 setOpen(false)
                 // We keep defaults on success so it's ready again
                 setSubject(defaultSubject)
@@ -68,17 +68,17 @@ export function EmailSubcontractorModal({
                         {children}
                     </div>
                 ) : (
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-400 hover:text-white" title="Email Subcontractor" onClick={(e) => e.stopPropagation()}>
-                        <Mail className="h-4 w-4" />
-                        <span className="sr-only">Email Subcontractor</span>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-400 hover:text-white" title="Message Subcontractor" onClick={(e) => e.stopPropagation()}>
+                        <MessageSquare className="h-4 w-4" />
+                        <span className="sr-only">Message Subcontractor</span>
                     </Button>
                 )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px] bg-slate-900 border-slate-800 text-slate-50">
                 <DialogHeader>
-                    <DialogTitle>Email {subcontractorEmail}</DialogTitle>
+                    <DialogTitle>Message {subcontractorEmail}</DialogTitle>
                     <DialogDescription className="text-slate-400">
-                        Send a message directly to this subcontractor. They can reply to your email address.
+                        Send an internal message directly to this subcontractor.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="grid gap-4 py-4">
@@ -112,7 +112,7 @@ export function EmailSubcontractorModal({
                         <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
                             {loading ? "Sending..." : (
                                 <>
-                                    <Send className="h-3 w-3" /> Send Email
+                                    <Send className="h-3 w-3" /> Send Message
                                 </>
                             )}
                         </Button>

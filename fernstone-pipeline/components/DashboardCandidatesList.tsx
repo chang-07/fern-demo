@@ -6,7 +6,7 @@ import { FileCheck, ShieldAlert } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { ApproveSubcontractorButton } from "@/components/ApproveSubcontractorButton"
 import { SubcontractorDetailModal } from "@/components/SubcontractorDetailModal"
-import { EmailSubcontractorModal } from "@/components/EmailSubcontractorModal"
+import { MessageSubcontractorModal } from "@/components/MessageSubcontractorModal"
 import { Button } from "@/components/ui/button"
 
 export function DashboardCandidatesList({ initialCompliantSubs, initialNonCompliantSubs }: { initialCompliantSubs: any[], initialNonCompliantSubs: any[] }) {
@@ -129,7 +129,7 @@ export function DashboardCandidatesList({ initialCompliantSubs, initialNonCompli
                                                 </div>
                                             )}
                                             <div className="flex gap-2 w-full mt-2">
-                                                <EmailSubcontractorModal
+                                                <MessageSubcontractorModal
                                                     subcontractorId={sub.id}
                                                     subcontractorEmail={sub.email}
                                                     defaultSubject={`Action Required: Insurance Gaps for ${project?.name}`}
@@ -138,7 +138,7 @@ export function DashboardCandidatesList({ initialCompliantSubs, initialNonCompli
                                                     <Button size="sm" variant="outline" className="w-full text-xs text-slate-300 border-slate-700 hover:bg-slate-800">
                                                         Prepare Action Reminder
                                                     </Button>
-                                                </EmailSubcontractorModal>
+                                                </MessageSubcontractorModal>
                                             </div>
                                         </div>
                                     </SubcontractorDetailModal>

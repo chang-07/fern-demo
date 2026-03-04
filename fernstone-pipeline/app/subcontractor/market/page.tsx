@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { MarketplaceClient } from "@/components/MarketplaceClient";
+import { GCDirectoryClient } from "@/components/GCDirectoryClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { JobPostingCard } from "@/components/JobPostingCard"
 import { Briefcase, Users } from "lucide-react"
@@ -48,7 +48,7 @@ export default async function SubcontractorMarketPage() {
         .from('job_postings')
         .select(`
             *,
-            project:projects(name, req_gl_occurrence, req_auto_limit, req_wc_limit, req_umbrella_limit, req_additional_insured)
+            project:projects(id, name, req_gl_occurrence, req_auto_limit, req_wc_limit, req_umbrella_limit, req_additional_insured)
         `)
         .eq('status', 'OPEN')
         .order('created_at', { ascending: false })
@@ -56,7 +56,7 @@ export default async function SubcontractorMarketPage() {
     // 3. Fetch the Subcontractor's own generic coverage limits
     const { data: myProfile } = await supabase
         .from('profiles')
-        .select('gl_limit, auto_limit, wc_limit, umbrella_limit, has_additional_insured')
+        .select('id, gl_limit, auto_limit, wc_limit, umbrella_limit, has_additional_insured')
         .eq('id', user.id)
         .single()
 
@@ -115,7 +115,7 @@ export default async function SubcontractorMarketPage() {
                 </TabsContent>
 
                 <TabsContent value="network" className="mt-0 outline-none">
-                    <MarketplaceClient initialSubcontractors={processedGCs} />
+                    <GCDirectoryClient initialGCs={processedGCs} subcontractorId={myProfile?.id || ''} />
                 </TabsContent>
             </Tabs>
         </div>

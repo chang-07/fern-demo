@@ -4,8 +4,12 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Briefcase, Calendar, Building2, ExternalLink, ShieldAlert, ShieldCheck, ChevronDown, ChevronUp, Mail } from "lucide-react"
+import { ContactGCModal } from "@/components/ContactGCModal"
+import { applyToJob } from "@/actions/apply-to-job"
+import { toast } from "sonner"
 
 interface ProjectRequirements {
+    id?: string;
     name: string;
     req_gl_occurrence: number | null;
     req_auto_limit: number | null;
@@ -15,6 +19,7 @@ interface ProjectRequirements {
 }
 
 interface ProfileLimits {
+    id: string;
     gl_limit: number | null;
     auto_limit: number | null;
     wc_limit: number | null;
@@ -34,6 +39,29 @@ export function JobPostingCard({
     profileLimits: ProfileLimits | null
 }) {
     const [expanded, setExpanded] = useState(false)
+    const [applying, setApplying] = useState(false)
+    const [applied, setApplied] = useState(false)
+
+    const handleApply = async () => {
+        if (!profileLimits?.id) return
+
+        setApplying(true)
+        const res = await applyToJob(
+            job.id,
+            job.title,
+            gc?.id || job.gc_id,
+            project?.id || null,
+            profileLimits.id
+        )
+
+        if (res.error) {
+            toast.error(res.error)
+        } else {
+            toast.success("Successfully applied to job!")
+            setApplied(true)
+        }
+        setApplying(false)
+    }
 
     // Helper to compare limits safely
     const meetsLimit = (required: number | null | undefined, actual: number | null | undefined) => {
@@ -153,14 +181,31 @@ export function JobPostingCard({
                         </div>
                     )}
 
-                    <div className="mt-6 pt-6 border-t border-slate-800/50 flex justify-end">
-                        <a
-                            href={`mailto:${gc?.email || ''}?subject=Application for Job Posting: ${encodeURIComponent(job.title)}`}
-                            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-900/20 h-10 px-6 py-2"
-                        >
-                            <Mail className="w-4 h-4 mr-2" />
-                            Contact GC to Apply
-                        </a>
+                    <div className="mt-6 pt-6 border-t border-slate-800/50 flex justify-end gap-3">
+                        {profileLimits?.id && (
+                            <>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleApply(); }}
+                                    disabled={applying || applied}
+                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-900/20 h-10 px-6 py-2"
+                                >
+                                    {applied ? "Applied" : applying ? "Applying..." : "Apply Directly"}
+                                </button>
+                                <ContactGCModal
+                                    subcontractorId={profileLimits.id}
+                                    gcId={gc?.id || job.gc_id}
+                                    projectName={project?.name || job.title}
+                                    projectId={project?.id}
+                                    defaultSubject={`Question regarding Job Posting: ${job.title}`}
+                                    defaultMessage={`Hi,\n\nI have a question about the ${job.title} position you posted on Fernstone.\n\nThanks,\nApplicant`}
+                                >
+                                    <button className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 disabled:pointer-events-none disabled:opacity-50 bg-slate-800 text-white hover:bg-slate-700 border border-slate-700 h-10 px-4 py-2">
+                                        <Mail className="w-4 h-4 mr-2" />
+                                        Contact GC
+                                    </button>
+                                </ContactGCModal>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

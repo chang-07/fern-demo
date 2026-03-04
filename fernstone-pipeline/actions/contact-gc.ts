@@ -1,72 +1,37 @@
 'use server'
 
 import { createClient } from '@supabase/supabase-js'
-import { resend } from '@/lib/resend'
 
-export async function contactGC(subcontractorId: string, subject: string, message: string) {
-    // Subcontractors don't have a user session, so we use the Service Role key
-    // to look up the project and GC details securely.
+export async function messageGC(senderProfileId: string, gcId: string, projectId: string | null, subject: string, message: string) {
     const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    // Fetch Subcontractor & GC Email
-    const { data: sub } = await supabase
-        .from('subcontractors')
-        .select(`
-            id,
-            email,
-            projects (
-                id,
-                name,
-                user_id:gc_id
-            )
-        `)
-        .eq('id', subcontractorId)
-        .single()
-
-    if (!sub || !sub.projects) {
-        return { error: 'Subcontractor not found' }
-    }
-
-    const project = sub.projects as any
-    // Fetch GC email
-    // "users" table is in auth schema, usually not accessible directly via public client.
-    // But with service role we can use auth.admin.getUserById()
-
-    const { data: { user: gcUser }, error: userError } = await supabase.auth.admin.getUserById(project.user_id)
-
-    if (userError || !gcUser || !gcUser.email) {
-        return { error: 'Could not contact GC' }
-    }
-
-    // Send Email
     try {
-        const { data, error } = await resend.emails.send({
-            from: 'Fernstone <updates@resend.dev>', // Use resend.dev for testing
-            to: [gcUser.email],
-            subject: `Subcontractor Question: ${project.name} - ${subject}`,
-            html: `
-                <p><strong>Project:</strong> ${project.name}</p>
-                <p><strong>From:</strong> ${sub.email}</p>
-                <p><strong>Message:</strong></p>
-                <div style="padding: 12px; border-left: 4px solid #ccc; background-color: #f9f9f9;">
-                    ${message.replace(/\n/g, '<br/>')}
-                </div>
-                <br/>
-                <p><small>You can reply directly to this email to contact the subcontractor.</small></p> 
-            `,
-            replyTo: sub.email
-        })
+        const insertData: any = {
+            sender_id: senderProfileId,
+            receiver_id: gcId,
+            subject: subject,
+            body: message
+        }
 
-        if (error) {
-            console.warn('Send email warning from Resend (demo mode):', error.message)
+        if (projectId) {
+            insertData.project_id = projectId;
+        }
+
+        const { error: msgError } = await supabase
+            .from('messages')
+            .insert(insertData)
+
+        if (msgError) {
+            console.error("Failed to insert message to GC:", msgError)
+            return { error: msgError.message }
         }
 
         return { success: true }
     } catch (error: any) {
-        console.warn('Send email try/catch warning (demo mode):', error.message)
-        return { success: true }
+        console.error('Send message try/catch warning:', error.message)
+        return { error: 'Failed to send message' }
     }
 }

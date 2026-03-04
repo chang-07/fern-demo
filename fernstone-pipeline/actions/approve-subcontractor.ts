@@ -2,7 +2,6 @@
 
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
-import { resend } from "@/lib/resend"
 
 export async function approveSubcontractor(subcontractorId: string) {
     const supabase = await createClient()
@@ -46,27 +45,32 @@ export async function approveSubcontractor(subcontractorId: string) {
 
         const isProjectComplete = true; // Hardcoded to true for demo flow
 
-        // Send Approval Email
-        const projectName = (subData.projects as any).name || "the project";
-        try {
-            const { error: resendError } = await resend.emails.send({
-                from: 'Fernstone <onboarding@resend.dev>',
-                to: [subData.email],
-                subject: `Insurance Approved: ${projectName}`,
-                html: `
-                    <h1>Compliance Approved!</h1>
-                    <p>Great news! Your insurance documents for <strong>${projectName}</strong> have been reviewed and approved.</p>
-                    <p>You are now cleared to begin work.</p>
-                    <br/>
-                    <p>Thank you,<br/>The Fernstone Team</p>
-                `
-            })
+        // 1. Get the receiver ID from their email
+        const { data: profile } = await (supabase as any)
+            .from('profiles')
+            .select('id')
+            .eq('email', subData.email)
+            .single();
 
-            if (resendError) {
-                console.warn('Resend demo warning in approve:', resendError.message)
+        const projectName = (subData.projects as any).name || "the project";
+
+        if (profile) {
+            // Send Approval Message
+            const { error: msgError } = await (supabase as any)
+                .from('messages')
+                .insert({
+                    sender_id: user.id, // The GC approving it
+                    receiver_id: profile.id, // The Subcontractor
+                    project_id: subData.project_id,
+                    subject: `Insurance Approved: ${projectName}`,
+                    body: `Great news! Your insurance documents for ${projectName} have been reviewed and approved.\n\nYou are now cleared to begin work.\n\nThank you,\nFernstone System`
+                });
+
+            if (msgError) {
+                console.error("Failed to insert approval message:", msgError);
             }
-        } catch (emailError: any) {
-            console.warn("Approve Subcontractor Warning (Demo fallback):", emailError.message)
+        } else {
+            console.warn("Could not find profile for email to send approval message:", subData.email);
         }
 
         // Revalidate the dashboard and project specific page

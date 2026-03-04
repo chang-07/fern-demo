@@ -16,17 +16,30 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Mail, Send } from "lucide-react"
 import { toast } from "sonner"
-import { contactGC } from "@/actions/contact-gc"
+import { messageGC } from "@/actions/contact-gc"
 
 interface ContactGCModalProps {
     subcontractorId: string
+    gcId: string
     projectName: string
+    projectId?: string
+    children?: React.ReactNode
+    defaultSubject?: string
+    defaultMessage?: string
 }
 
-export function ContactGCModal({ subcontractorId, projectName }: ContactGCModalProps) {
+export function ContactGCModal({
+    subcontractorId,
+    gcId,
+    projectId,
+    projectName,
+    children,
+    defaultSubject = "",
+    defaultMessage = ""
+}: ContactGCModalProps) {
     const [open, setOpen] = useState(false)
-    const [subject, setSubject] = useState("")
-    const [message, setMessage] = useState("")
+    const [subject, setSubject] = useState(defaultSubject)
+    const [message, setMessage] = useState(defaultMessage)
     const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +47,7 @@ export function ContactGCModal({ subcontractorId, projectName }: ContactGCModalP
         setLoading(true)
 
         try {
-            const result = await contactGC(subcontractorId, subject, message)
+            const result = await messageGC(subcontractorId, gcId, projectId || null, subject, message)
             if (result?.error) {
                 toast.error(result.error)
             } else {
@@ -53,9 +66,11 @@ export function ContactGCModal({ subcontractorId, projectName }: ContactGCModalP
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="w-full border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 gap-2">
-                    <Mail className="h-4 w-4" /> Contact GC
-                </Button>
+                {children ? children : (
+                    <Button variant="outline" className="w-full border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 gap-2">
+                        <Mail className="h-4 w-4" /> Contact GC
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px] bg-slate-900 border-slate-800 text-slate-50">
                 <DialogHeader>

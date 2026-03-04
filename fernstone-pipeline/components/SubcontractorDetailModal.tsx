@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { CheckCircle2, XCircle, Mail, Send } from "lucide-react"
-import { contactSubcontractor } from "@/actions/contact-subcontractor"
+import { messageSubcontractor } from "@/actions/contact-subcontractor"
 import { toast } from "sonner"
 
 interface SubcontractorDetailModalProps {
@@ -36,7 +36,7 @@ export function SubcontractorDetailModal({ children, subcontractor, showContact 
         }
 
         setIsSending(true);
-        const res = await contactSubcontractor(subcontractor.id, subcontractor.email, message);
+        const res = await messageSubcontractor(subcontractor.id, subcontractor.email, message);
         setIsSending(false);
 
         if (res.error) {
