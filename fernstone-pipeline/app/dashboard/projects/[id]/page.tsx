@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, Mail, Plus } from "lucide-react"
 import Link from "next/link"
 import { InviteSubcontractorModal } from "@/components/InviteSubcontractorModal"
+import { ReopenProjectButton } from "@/components/ReopenProjectButton"
+import { Badge } from "@/components/ui/badge"
 
 // Params need to be awaited in Next.js 15
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
@@ -34,6 +36,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                 <div>
                     <div className="flex items-center gap-3 flex-wrap">
                         <h1 className="text-2xl font-bold text-white">{project.name}</h1>
+                        {project.status === 'CLOSED' && (
+                            <Badge variant="outline" className="bg-slate-800 text-slate-300 border-slate-700">Closed</Badge>
+                        )}
                         <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-400">
                             <span className="font-medium text-slate-300">GL:</span> ${(project.req_gl_occurrence || 0) / 1000000}M
                         </div>
@@ -55,12 +60,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                     </div>
 
                 </div>
-                <div className="ml-auto">
-                    <InviteSubcontractorModal projectId={id} />
+                <div className="ml-auto flex gap-2">
+                    {project.status === 'CLOSED' ? (
+                        <ReopenProjectButton projectId={id} />
+                    ) : (
+                        <InviteSubcontractorModal projectId={id} />
+                    )}
                 </div>
             </div>
 
-            <SubcontractorTable projectId={id} />
+            <SubcontractorTable projectId={id} projectStatus={project.status || undefined} />
         </div>
     )
 }

@@ -6,9 +6,14 @@ import { FileCheck, ShieldAlert } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { ApproveSubcontractorButton } from "@/components/ApproveSubcontractorButton"
 import { SubcontractorDetailModal } from "@/components/SubcontractorDetailModal"
-import { SendReminderButton } from "@/components/SendReminderButton"
+import { EmailSubcontractorModal } from "@/components/EmailSubcontractorModal"
+import { Button } from "@/components/ui/button"
+import { useState } from "react"
+import { ProjectClosedCelebration } from "@/components/ProjectClosedCelebration"
 
 export function DashboardCandidatesList({ initialCompliantSubs, initialNonCompliantSubs }: { initialCompliantSubs: any[], initialNonCompliantSubs: any[] }) {
+    const [celebration, setCelebration] = useState({ open: false, projectName: "" })
+
     // We combine them into a single list for optimistic updates so moving a sub from non-compliant to compliant removes it instantly
     const allSubs = [...initialCompliantSubs, ...initialNonCompliantSubs]
 
@@ -66,14 +71,18 @@ export function DashboardCandidatesList({ initialCompliantSubs, initialNonCompli
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div onClick={(e) => {
-                                                // Optimistic hide
-                                                e.stopPropagation()
-                                                startTransition(() => {
-                                                    addOptimisticUpdate({ id: sub.id, status: 'APPROVED' })
-                                                })
-                                            }}>
-                                                <ApproveSubcontractorButton subcontractorId={sub.id} />
+                                            <div>
+                                                <ApproveSubcontractorButton
+                                                    subcontractorId={sub.id}
+                                                    onApprove={(result: any) => {
+                                                        startTransition(() => {
+                                                            addOptimisticUpdate({ id: sub.id, status: 'APPROVED' })
+                                                        })
+                                                        if (result?.projectClosed) {
+                                                            setCelebration({ open: true, projectName: result.projectName || project?.name })
+                                                        }
+                                                    }}
+                                                />
                                             </div>
                                         </div>
                                     </SubcontractorDetailModal>
@@ -122,8 +131,17 @@ export function DashboardCandidatesList({ initialCompliantSubs, initialNonCompli
                                                     ))}
                                                 </div>
                                             )}
-                                            <div className="flex gap-2">
-                                                <SendReminderButton />
+                                            <div className="flex gap-2 w-full mt-2">
+                                                <EmailSubcontractorModal
+                                                    subcontractorId={sub.id}
+                                                    subcontractorEmail={sub.email}
+                                                    defaultSubject={`Action Required: Insurance Gaps for ${project?.name}`}
+                                                    defaultMessage={`Hello,\n\nPlease review and update your insurance documents for the ${project?.name} project. We noticed the following missing requirements:\n\n${(report?.deficiencies || []).map((def: string) => `- ${def}`).join('\n')}\n\nPlease upload a new Certificate of Insurance that meets these limits.\n\nThank you.`}
+                                                >
+                                                    <Button size="sm" variant="outline" className="w-full text-xs text-slate-300 border-slate-700 hover:bg-slate-800">
+                                                        Prepare Action Reminder
+                                                    </Button>
+                                                </EmailSubcontractorModal>
                                             </div>
                                         </div>
                                     </SubcontractorDetailModal>
@@ -133,6 +151,12 @@ export function DashboardCandidatesList({ initialCompliantSubs, initialNonCompli
                     )}
                 </CardContent>
             </Card>
+
+            <ProjectClosedCelebration
+                open={celebration.open}
+                onOpenChange={(open) => setCelebration({ ...celebration, open })}
+                projectName={celebration.projectName}
+            />
         </div>
     )
 }

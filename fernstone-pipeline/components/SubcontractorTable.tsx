@@ -13,8 +13,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle, AlertTriangle, Clock, Download } from "lucide-react"
 import { EmailSubcontractorModal } from "@/components/EmailSubcontractorModal"
+import { SubcontractorTableApproveAction } from "@/components/SubcontractorTableApproveAction"
 
-export async function SubcontractorTable({ projectId }: { projectId: string }) {
+export async function SubcontractorTable({ projectId, projectStatus }: { projectId: string, projectStatus?: string }) {
     const supabase = await createClient()
 
     // Fetch subcontractors with their latest compliance report
@@ -31,7 +32,8 @@ export async function SubcontractorTable({ projectId }: { projectId: string }) {
         expiry_date,
         is_compliant,
         deficiencies
-      )
+      ),
+      projects (name)
     `)
         .eq("project_id", projectId)
         .order("created_at", { ascending: false })
@@ -70,6 +72,7 @@ export async function SubcontractorTable({ projectId }: { projectId: string }) {
                                 UPLOADED: "bg-blue-900/50 text-blue-400 border-blue-800",
                                 COMPLIANT: "bg-emerald-900/50 text-emerald-400 border-emerald-800",
                                 NON_COMPLIANT: "bg-amber-900/50 text-amber-400 border-amber-800",
+                                APPROVED: "bg-emerald-600 text-white border-emerald-500",
                             }
 
                             return (
@@ -105,7 +108,13 @@ export async function SubcontractorTable({ projectId }: { projectId: string }) {
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            {sub.status !== 'APPROVED' && report && projectStatus !== 'CLOSED' && (
+                                                <SubcontractorTableApproveAction
+                                                    subcontractorId={sub.id}
+                                                    projectName={(sub.projects as any)?.name}
+                                                />
+                                            )}
                                             <EmailSubcontractorModal
                                                 subcontractorId={sub.id}
                                                 subcontractorEmail={sub.email}

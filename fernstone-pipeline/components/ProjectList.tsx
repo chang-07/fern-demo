@@ -25,8 +25,13 @@ export function ProjectList({ projects }: { projects: any[] }) {
                         <CardHeader className="flex flex-col items-start justify-between space-y-2 pb-2">
                             <div className="flex w-full justify-between items-start">
                                 <div>
-                                    <CardTitle className="text-base font-semibold text-slate-200 leading-tight">
+                                    <CardTitle className="text-base font-semibold text-slate-200 leading-tight flex items-center gap-2">
                                         {project.name}
+                                        {project.status === 'CLOSED' && (
+                                            <Badge variant="outline" className="text-[10px] uppercase tracking-wider bg-slate-800 text-slate-400 border-slate-700 h-5 px-1.5">
+                                                Closed
+                                            </Badge>
+                                        )}
                                     </CardTitle>
                                     <CardDescription className="text-xs text-slate-400 mt-1">
                                         Coverage: ${(project.req_gl_occurrence || 0) / 1000000}M GL / ${(project.requirements?.gl?.aggregate || 0) / 1000000}M Agg
@@ -41,7 +46,7 @@ export function ProjectList({ projects }: { projects: any[] }) {
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-white">0</div>
+                            <div className="text-2xl font-bold text-white">{project.subcontractorCount || 0}</div>
                             <p className="text-xs text-slate-400 flex items-center mt-1">
                                 <Users className="w-3 h-3 mr-1" />
                                 Subcontractors

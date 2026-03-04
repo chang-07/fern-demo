@@ -21,12 +21,21 @@ import { sendEmailToSubcontractor } from "@/actions/send-email"
 interface EmailSubcontractorModalProps {
     subcontractorId: string
     subcontractorEmail: string
+    defaultSubject?: string
+    defaultMessage?: string
+    children?: React.ReactNode
 }
 
-export function EmailSubcontractorModal({ subcontractorId, subcontractorEmail }: EmailSubcontractorModalProps) {
+export function EmailSubcontractorModal({
+    subcontractorId,
+    subcontractorEmail,
+    defaultSubject = "",
+    defaultMessage = "",
+    children
+}: EmailSubcontractorModalProps) {
     const [open, setOpen] = useState(false)
-    const [subject, setSubject] = useState("")
-    const [message, setMessage] = useState("")
+    const [subject, setSubject] = useState(defaultSubject)
+    const [message, setMessage] = useState(defaultMessage)
     const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -40,8 +49,9 @@ export function EmailSubcontractorModal({ subcontractorId, subcontractorEmail }:
             } else {
                 toast.success(`Email sent to ${subcontractorEmail}`)
                 setOpen(false)
-                setSubject("")
-                setMessage("")
+                // We keep defaults on success so it's ready again
+                setSubject(defaultSubject)
+                setMessage(defaultMessage)
             }
         } catch (error) {
             toast.error("An unexpected error occurred")
@@ -53,10 +63,16 @@ export function EmailSubcontractorModal({ subcontractorId, subcontractorEmail }:
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-400 hover:text-white" title="Email Subcontractor">
-                    <Mail className="h-4 w-4" />
-                    <span className="sr-only">Email Subcontractor</span>
-                </Button>
+                {children ? (
+                    <div onClick={(e) => e.stopPropagation()}>
+                        {children}
+                    </div>
+                ) : (
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-400 hover:text-white" title="Email Subcontractor" onClick={(e) => e.stopPropagation()}>
+                        <Mail className="h-4 w-4" />
+                        <span className="sr-only">Email Subcontractor</span>
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px] bg-slate-900 border-slate-800 text-slate-50">
                 <DialogHeader>

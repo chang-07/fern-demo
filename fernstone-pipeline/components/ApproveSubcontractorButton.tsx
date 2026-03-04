@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { approveSubcontractor } from "@/actions/approve-subcontractor"
 import { Check } from "lucide-react"
 
-export function ApproveSubcontractorButton({ subcontractorId }: { subcontractorId: string }) {
+export function ApproveSubcontractorButton({ subcontractorId, onApprove }: { subcontractorId: string, onApprove?: (result: any) => void }) {
     const [loading, setLoading] = useState(false)
 
     const handleApprove = async (e: React.MouseEvent) => {
@@ -20,6 +20,7 @@ export function ApproveSubcontractorButton({ subcontractorId }: { subcontractorI
                 toast.error(result.error)
             } else {
                 toast.success("Subcontractor approved successfully.")
+                onApprove?.(result)
             }
         } catch (error) {
             toast.error("An unexpected error occurred.")

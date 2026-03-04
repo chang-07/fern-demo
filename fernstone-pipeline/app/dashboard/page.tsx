@@ -42,7 +42,7 @@ export default async function DashboardPage() {
         .from("subcontractors")
         .select(`
             id, email, status, project_id,
-            projects (name, req_gl_occurrence),
+            projects (name, req_gl_occurrence, status),
             compliance_reports (
                 is_compliant, deficiencies, extracted_gl_limit
             )
@@ -54,9 +54,14 @@ export default async function DashboardPage() {
 
     // Aggregates
     const totalSubs = subs.length;
-    const compliantSubs = subs.filter(s => s.status === 'COMPLIANT');
-    const nonCompliantSubs = subs.filter(s => s.status === 'NON_COMPLIANT');
+    const compliantSubs = subs.filter(s => s.status === 'COMPLIANT' && (s.projects as any)?.status !== 'CLOSED');
+    const nonCompliantSubs = subs.filter(s => s.status === 'NON_COMPLIANT' && (s.projects as any)?.status !== 'CLOSED');
     const complianceRate = totalSubs > 0 ? Math.round((compliantSubs.length / totalSubs) * 100) : 0;
+
+    const projectsWithCounts = projects?.map(p => ({
+        ...p,
+        subcontractorCount: subs.filter(s => s.project_id === p.id).length
+    })) || [];
 
     return (
         <div className="space-y-8 pb-12">
@@ -132,7 +137,7 @@ export default async function DashboardPage() {
                 <div className="lg:col-span-1">
                     <div className="sticky top-24">
                         <h2 className="text-xl font-bold text-white mb-4">Project Portfolios</h2>
-                        <ProjectList projects={projects || []} />
+                        <ProjectList projects={projectsWithCounts} />
                     </div>
                 </div>
             </div>
