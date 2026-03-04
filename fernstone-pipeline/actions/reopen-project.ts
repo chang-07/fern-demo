@@ -30,6 +30,17 @@ export async function reopenProject(projectId: string) {
 
         if (updateError) throw updateError
 
+        // Revert approved subcontractors to compliant so the demo can be re-run
+        const { error: subsError } = await supabase
+            .from("subcontractors")
+            .update({ status: 'COMPLIANT' })
+            .eq("project_id", projectId)
+            .eq("status", "APPROVED")
+
+        if (subsError) {
+            console.error("Failed to revert subcontractors on reopen:", subsError)
+        }
+
         revalidatePath("/dashboard")
         revalidatePath(`/dashboard/projects/${projectId}`)
 

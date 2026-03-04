@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { UserProfileMenu } from "@/components/UserProfileMenu";
+import { GlobalCelebration } from "@/components/GlobalCelebration";
 
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
@@ -52,6 +53,7 @@ export default async function DashboardLayout({
             <main className="container mx-auto p-4 md:p-8">
                 {children}
             </main>
+            <GlobalCelebration />
         </div>
     );
 }

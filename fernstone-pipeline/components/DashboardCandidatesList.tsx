@@ -8,11 +8,8 @@ import { ApproveSubcontractorButton } from "@/components/ApproveSubcontractorBut
 import { SubcontractorDetailModal } from "@/components/SubcontractorDetailModal"
 import { EmailSubcontractorModal } from "@/components/EmailSubcontractorModal"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
-import { ProjectClosedCelebration } from "@/components/ProjectClosedCelebration"
 
 export function DashboardCandidatesList({ initialCompliantSubs, initialNonCompliantSubs }: { initialCompliantSubs: any[], initialNonCompliantSubs: any[] }) {
-    const [celebration, setCelebration] = useState({ open: false, projectName: "" })
 
     // We combine them into a single list for optimistic updates so moving a sub from non-compliant to compliant removes it instantly
     const allSubs = [...initialCompliantSubs, ...initialNonCompliantSubs]
@@ -79,7 +76,7 @@ export function DashboardCandidatesList({ initialCompliantSubs, initialNonCompli
                                                             addOptimisticUpdate({ id: sub.id, status: 'APPROVED' })
                                                         })
                                                         if (result?.projectClosed) {
-                                                            setCelebration({ open: true, projectName: result.projectName || project?.name })
+                                                            window.dispatchEvent(new CustomEvent('project-closed', { detail: result.projectName || project?.name }))
                                                         }
                                                     }}
                                                 />
@@ -151,12 +148,6 @@ export function DashboardCandidatesList({ initialCompliantSubs, initialNonCompli
                     )}
                 </CardContent>
             </Card>
-
-            <ProjectClosedCelebration
-                open={celebration.open}
-                onOpenChange={(open) => setCelebration({ ...celebration, open })}
-                projectName={celebration.projectName}
-            />
         </div>
     )
 }

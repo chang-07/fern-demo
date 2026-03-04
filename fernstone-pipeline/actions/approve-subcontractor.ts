@@ -13,6 +13,7 @@ export async function approveSubcontractor(subcontractorId: string) {
         return { error: "Not authenticated" }
     }
 
+    console.log(`[APPROVE ACTION] Starting approval for sub: ${subcontractorId}`)
     try {
         const { data: subData, error: fetchError } = await supabase
             .from("subcontractors")
@@ -20,7 +21,10 @@ export async function approveSubcontractor(subcontractorId: string) {
             .eq("id", subcontractorId)
             .single()
 
+        console.log(`[APPROVE ACTION] Fetch result: error=`, fetchError, `data=`, subData)
+
         if (fetchError || !subData || (subData.projects as any).gc_id !== user.id) {
+            console.log(`[APPROVE ACTION] Unauthorized or missing. GC ID check:`, (subData?.projects as any)?.gc_id, `User ID:`, user.id)
             return { error: "Unauthorized to approve this subcontractor." }
         }
 
@@ -32,46 +36,37 @@ export async function approveSubcontractor(subcontractorId: string) {
 
         if (updateError) throw updateError
 
-        // Query for any other unapproved subcontractors for this project
-        const { data: pendingSubs, error: pendingError } = await supabase
-            .from("subcontractors")
-            .select("id")
-            .eq("project_id", subData.project_id)
-            .neq("id", subcontractorId) // Exclude the one we just approved since we haven't committed the transaction yet
-            .neq("status", "APPROVED")
+        // Always close the project for the demo flow when a sub is approved
+        const { error: projectError } = await supabase
+            .from("projects")
+            .update({ status: 'CLOSED' })
+            .eq("id", subData.project_id)
 
-        if (pendingError) throw pendingError
+        if (projectError) throw projectError
 
-        const isProjectComplete = pendingSubs.length === 0;
-
-        if (isProjectComplete) {
-            // Close the Project only if all subs are approved
-            const { error: projectError } = await supabase
-                .from("projects")
-                .update({ status: 'CLOSED' })
-                .eq("id", subData.project_id)
-
-            if (projectError) throw projectError
-        }
+        const isProjectComplete = true; // Hardcoded to true for demo flow
 
         // Send Approval Email
         const projectName = (subData.projects as any).name || "the project";
-        const { error: resendError } = await resend.emails.send({
-            from: 'Fernstone <onboarding@resend.dev>',
-            to: [subData.email],
-            subject: `Insurance Approved: ${projectName}`,
-            html: `
-                <h1>Compliance Approved!</h1>
-                <p>Great news! Your insurance documents for <strong>${projectName}</strong> have been reviewed and approved.</p>
-                <p>You are now cleared to begin work.</p>
-                <br/>
-                <p>Thank you,<br/>The Fernstone Team</p>
-            `
-        })
+        try {
+            const { error: resendError } = await resend.emails.send({
+                from: 'Fernstone <onboarding@resend.dev>',
+                to: [subData.email],
+                subject: `Insurance Approved: ${projectName}`,
+                html: `
+                    <h1>Compliance Approved!</h1>
+                    <p>Great news! Your insurance documents for <strong>${projectName}</strong> have been reviewed and approved.</p>
+                    <p>You are now cleared to begin work.</p>
+                    <br/>
+                    <p>Thank you,<br/>The Fernstone Team</p>
+                `
+            })
 
-        if (resendError) {
-            console.warn('Resend demo warning in approve:', resendError.message)
-            // Do not throw, allow demo to proceed to revalidate
+            if (resendError) {
+                console.warn('Resend demo warning in approve:', resendError.message)
+            }
+        } catch (emailError: any) {
+            console.warn("Approve Subcontractor Warning (Demo fallback):", emailError.message)
         }
 
         // Revalidate the dashboard and project specific page
@@ -84,7 +79,7 @@ export async function approveSubcontractor(subcontractorId: string) {
             projectName: isProjectComplete ? projectName : undefined
         }
     } catch (error: any) {
-        console.warn("Approve Subcontractor Warning (Demo fallback):", error.message)
-        return { success: true } // Return success to fail gracefully in demo
+        console.error("Approve Subcontractor DB Error:", error)
+        return { error: error.message || "Failed to approve subcontractor." }
     }
 }
