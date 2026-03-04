@@ -10,16 +10,17 @@ export default async function GCInboxPage() {
         redirect("/login")
     }
 
-    // Fetch messages where this GC is the receiver
-    const { data: messages, error } = await supabase
+    // Fetch messages where this GC is the receiver or sender
+    const { data: messages, error } = await (supabase as any)
         .from('messages')
         .select(`
             *,
             sender:sender_id ( email ),
+            receiver:receiver_id ( email ),
             project:project_id ( name ),
             job_posting:job_posting_id ( title )
         `)
-        .eq('receiver_id', user.id)
+        .or(`receiver_id.eq.${user.id},sender_id.eq.${user.id}`)
         .order('created_at', { ascending: false })
 
     if (error) {
@@ -33,7 +34,7 @@ export default async function GCInboxPage() {
             </div>
 
             <div className="mt-6">
-                <MessageList initialMessages={messages || []} />
+                <MessageList initialMessages={messages || []} currentUserId={user.id} />
             </div>
         </div>
     )

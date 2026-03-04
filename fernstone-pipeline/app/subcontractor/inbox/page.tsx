@@ -21,16 +21,17 @@ export default async function SubcontractorInboxPage() {
         redirect("/onboarding")
     }
 
-    // Fetch messages where this Subcontractor Profile is the receiver
+    // Fetch messages where this Subcontractor Profile is the receiver or sender
     const { data: messages, error } = await (supabase as any)
         .from('messages')
         .select(`
             *,
             sender:sender_id ( email ),
+            receiver:receiver_id ( email ),
             project:project_id ( name ),
             job_posting:job_posting_id ( title )
         `)
-        .eq('receiver_id', profile.id)
+        .or(`receiver_id.eq.${profile.id},sender_id.eq.${profile.id}`)
         .order('created_at', { ascending: false })
 
     if (error) {

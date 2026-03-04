@@ -1,11 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { formatDistanceToNow } from "date-fns"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { MessageSquare, Calendar, Building2, Briefcase, Mail } from "lucide-react"
+import { MessageSquare, Calendar, Building2, Briefcase, Mail, Reply, Send } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+import { replyToMessage } from "@/actions/reply-message"
 
 type Message = {
     id: string
@@ -23,8 +28,33 @@ type Message = {
 }
 
 export function MessageList({ initialMessages }: { initialMessages: Message[] }) {
+    const router = useRouter()
     const [messages, setMessages] = useState<Message[]>(initialMessages)
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null)
+    const [replyBody, setReplyBody] = useState("")
+    const [isReplying, setIsReplying] = useState(false)
+    const [showReplyBox, setShowReplyBox] = useState(false)
+
+    useEffect(() => {
+        setMessages(initialMessages)
+    }, [initialMessages])
+
+    const handleReply = async () => {
+        if (!selectedMessage || !replyBody.trim()) return
+
+        setIsReplying(true)
+        const result = await replyToMessage(selectedMessage.id, replyBody)
+        setIsReplying(false)
+
+        if (result.error) {
+            toast.error(result.error)
+        } else {
+            toast.success("Reply sent successfully")
+            setReplyBody("")
+            setShowReplyBox(false)
+            router.refresh()
+        }
+    }
 
     if (messages.length === 0) {
         return (
@@ -59,7 +89,11 @@ export function MessageList({ initialMessages }: { initialMessages: Message[] })
                         {messages.map((message) => (
                             <button
                                 key={message.id}
-                                onClick={() => setSelectedMessage(message)}
+                                onClick={() => {
+                                    setSelectedMessage(message)
+                                    setShowReplyBox(false)
+                                    setReplyBody("")
+                                }}
                                 className={`text-left p-4 border-b border-slate-800/50 transition-colors last:border-0 hover:bg-slate-800/50 ${selectedMessage?.id === message.id ? 'bg-slate-800' : ''}`}
                             >
                                 <div className="flex justify-between items-start mb-1 gap-2">
@@ -85,7 +119,7 @@ export function MessageList({ initialMessages }: { initialMessages: Message[] })
             <Card className="md:col-span-2 bg-slate-900 border-slate-800 flex flex-col h-full overflow-hidden">
                 {selectedMessage ? (
                     <>
-                        <CardHeader className="border-b border-slate-800 bg-slate-800/20">
+                        <CardHeader className="border-b border-slate-800 bg-slate-800/10 p-6 md:p-8">
                             <div className="flex flex-col gap-4">
                                 <div className="flex justify-between items-start">
                                     <CardTitle className="text-xl text-white leading-tight">
@@ -115,11 +149,59 @@ export function MessageList({ initialMessages }: { initialMessages: Message[] })
                                 </div>
                             </div>
                         </CardHeader>
-                        <ScrollArea className="flex-1 p-6">
-                            <div className="prose prose-invert max-w-none text-slate-300 whitespace-pre-wrap">
-                                {selectedMessage.body}
+                        <div className="flex-1 overflow-y-auto min-h-0">
+                            <div className="p-6 md:p-8 pb-12">
+                                <div className="prose prose-invert max-w-none text-slate-300 whitespace-pre-wrap leading-relaxed font-sans">
+                                    {selectedMessage.body}
+                                </div>
+
+                                {/* Reply Section */}
+                                <div className="mt-12 pt-8 pb-8 border-t border-slate-800/50">
+                                    {!showReplyBox ? (
+                                        <Button
+                                            className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 gap-2 h-11 px-6 shadow-sm transition-all"
+                                            onClick={() => setShowReplyBox(true)}
+                                        >
+                                            <Reply className="h-4 w-4" /> Reply
+                                        </Button>
+                                    ) : (
+                                        <div className="space-y-4 animate-in slide-in-from-top-2 duration-200 bg-slate-900/50 p-6 rounded-xl border border-slate-800/80 mb-12">
+                                            <h4 className="text-sm font-medium text-slate-300 flex items-center gap-2 mb-2 font-sans tracking-tight">
+                                                <Reply className="h-4 w-4 text-blue-400" />
+                                                Replying to {selectedMessage.sender?.email || "System Message"}
+                                            </h4>
+                                            <Textarea
+                                                placeholder="Write your reply here..."
+                                                className="min-h-[160px] bg-slate-950 border-slate-700 text-slate-200 focus-visible:ring-blue-500 rounded-lg p-4 text-sm font-sans resize-y"
+                                                value={replyBody}
+                                                onChange={(e) => setReplyBody(e.target.value)}
+                                            />
+                                            <div className="flex gap-3 justify-end pt-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    className="text-slate-400 hover:text-white h-11 px-6"
+                                                    onClick={() => {
+                                                        setShowReplyBox(false)
+                                                        setReplyBody("")
+                                                    }}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                                <Button
+                                                    className="bg-blue-600 hover:bg-blue-700 text-white gap-2 h-11 px-8 shadow-lg shadow-blue-900/20 font-medium"
+                                                    disabled={isReplying || !replyBody.trim()}
+                                                    onClick={handleReply}
+                                                >
+                                                    {isReplying ? "Sending..." : (
+                                                        <><Send className="h-4 w-4 -ml-1" /> Send Message</>
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </ScrollArea>
+                        </div>
                     </>
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center text-slate-500">
