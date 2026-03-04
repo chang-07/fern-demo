@@ -45,7 +45,7 @@ export default async function SubcontractorInboxPage() {
             </div>
 
             <div className="mt-6">
-                <MessageList initialMessages={messages || []} />
+                <MessageList initialMessages={messages || []} currentUserId={profile.id} />
             </div>
         </div>
     )
